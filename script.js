@@ -9,10 +9,10 @@ class CodeEditorApp {
         
         this.currentFileType = 'html';
         this.projectName = 'مشروع جديد';
-        this.previewDevice = 'desktop';
-        this.isPreviewFullscreen = false;
         this.isFullscreen = false;
         this.theme = localStorage.getItem('codeEditorTheme') || 'light';
+        this.previewWindow = null;
+        this.previewUrl = null;
         
         this.initializeApp();
     }
@@ -26,6 +26,9 @@ class CodeEditorApp {
         this.renderEditorTabs();
         this.setupCodeEditors();
         this.updateStatus('جاهز', 'success');
+        
+        // Setup mobile gestures
+        this.setupMobileGestures();
     }
     
     // Get default HTML content
@@ -37,6 +40,8 @@ class CodeEditorApp {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مشروعي الأول</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -330,12 +335,12 @@ function addRandomEffect(element) {
     setupEventListeners() {
         // Menu toggle
         document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
+            this.toggleSidebar();
         });
         
-        // Run code (opens preview modal)
+        // Run code - opens in new window
         document.getElementById('runBtn').addEventListener('click', () => {
-            this.runCode();
+            this.runCodeInNewWindow();
         });
         
         // Save all
@@ -375,27 +380,6 @@ function addRandomEffect(element) {
             });
         });
         
-        // Preview modal controls
-        document.getElementById('closePreviewBtn').addEventListener('click', () => {
-            this.closePreview();
-        });
-        
-        document.getElementById('refreshPreviewBtn').addEventListener('click', () => {
-            this.refreshPreview();
-        });
-        
-        document.getElementById('fullscreenPreviewBtn').addEventListener('click', () => {
-            this.togglePreviewFullscreen();
-        });
-        
-        // Device switcher buttons
-        document.querySelectorAll('.btn-device').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const device = e.target.closest('button').dataset.device;
-                this.switchPreviewDevice(device);
-            });
-        });
-        
         // Format code buttons
         document.querySelectorAll('[data-action="format"]').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -425,7 +409,7 @@ function addRandomEffect(element) {
             // Run with Ctrl+R
             if (e.ctrlKey && e.key === 'r') {
                 e.preventDefault();
-                this.runCode();
+                this.runCodeInNewWindow();
             }
             
             // New file with Ctrl+N
@@ -434,16 +418,15 @@ function addRandomEffect(element) {
                 this.showNewFileModal();
             }
             
-            // Close preview with Escape
-            if (e.key === 'Escape' && document.getElementById('previewModal').classList.contains('active')) {
-                e.preventDefault();
-                this.closePreview();
-            }
-            
             // Format code with Ctrl+Shift+F
             if (e.ctrlKey && e.shiftKey && e.key === 'F') {
                 e.preventDefault();
                 this.formatCode(this.currentFileType);
+            }
+            
+            // Close sidebar with Escape
+            if (e.key === 'Escape') {
+                this.closeSidebar();
             }
         });
         
@@ -456,14 +439,95 @@ function addRandomEffect(element) {
                 sidebar.classList.contains('open') && 
                 !sidebar.contains(e.target) && 
                 !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
+                this.closeSidebar();
             }
         });
         
-        // Update preview size on resize
+        // Handle window resize
         window.addEventListener('resize', () => {
-            this.updatePreviewSize();
+            this.handleResize();
         });
+        
+        // Handle beforeunload to close preview windows
+        window.addEventListener('beforeunload', () => {
+            if (this.previewWindow && !this.previewWindow.closed) {
+                this.previewWindow.close();
+            }
+        });
+    }
+    
+    // Setup mobile gestures
+    setupMobileGestures() {
+        let startX = 0;
+        let startY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchend', (e) => {
+            if (!startX || !startY) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            
+            // Swipe right to left to open sidebar on mobile
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50 && window.innerWidth <= 768) {
+                this.openSidebar();
+            }
+            
+            // Swipe left to right to close sidebar
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50 && window.innerWidth <= 768) {
+                this.closeSidebar();
+            }
+            
+            startX = 0;
+            startY = 0;
+        }, { passive: true });
+    }
+    
+    // Handle window resize
+    handleResize() {
+        // Close sidebar on resize to desktop
+        if (window.innerWidth > 768) {
+            this.closeSidebar();
+        }
+    }
+    
+    // Toggle sidebar
+    toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('open');
+        
+        // Prevent body scroll when sidebar is open on mobile
+        if (window.innerWidth <= 768) {
+            if (sidebar.classList.contains('open')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+    }
+    
+    // Open sidebar
+    openSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.add('open');
+        
+        if (window.innerWidth <= 768) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    // Close sidebar
+    closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.remove('open');
+        document.body.style.overflow = '';
     }
     
     // Render file list
@@ -492,6 +556,9 @@ function addRandomEffect(element) {
             li.addEventListener('click', (e) => {
                 if (!e.target.closest('.file-actions')) {
                     this.switchToFile(file.type);
+                    if (window.innerWidth <= 768) {
+                        this.closeSidebar();
+                    }
                 }
             });
             
@@ -543,8 +610,28 @@ function addRandomEffect(element) {
                 textarea.value = file.content;
                 textarea.spellcheck = false;
                 
+                // Improve mobile editing experience
+                textarea.style.fontSize = window.innerWidth <= 480 ? '13px' : '14px';
+                textarea.style.lineHeight = '1.6';
+                
                 textarea.addEventListener('input', (e) => {
                     this.saveFileContent(file.type, e.target.value);
+                });
+                
+                // Handle keyboard for mobile
+                textarea.addEventListener('keydown', (e) => {
+                    // Tab key support
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        
+                        // Insert tab
+                        textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
+                        
+                        // Move cursor
+                        textarea.selectionStart = textarea.selectionEnd = start + 2;
+                    }
                 });
                 
                 // Replace the editor div with textarea
@@ -592,8 +679,8 @@ function addRandomEffect(element) {
         }
     }
     
-    // Run code and open preview modal
-    runCode() {
+    // Run code in new window
+    runCodeInNewWindow() {
         this.updateStatus('جاري التشغيل...', 'warning');
         
         const htmlFile = this.files.find(f => f.type === 'html');
@@ -632,19 +719,15 @@ function addRandomEffect(element) {
             htmlContent = htmlContent.replace('</head>', `${googleFonts}\n</head>`);
         }
         
-        // Update preview iframe
-        const previewFrame = document.getElementById('previewFrame');
-        const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        // Create a blob URL for the HTML content
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        this.previewUrl = URL.createObjectURL(blob);
         
-        previewDoc.open();
-        previewDoc.write(htmlContent);
-        previewDoc.close();
+        // Generate preview HTML with mobile-friendly features
+        const previewHTML = this.generatePreviewPage(htmlContent);
         
-        // Open preview modal
-        this.openPreview();
-        
-        // Update preview stats
-        this.updatePreviewStats();
+        // Open in new window/tab
+        this.openPreviewWindow(previewHTML);
         
         this.showToast('✅ تم تشغيل الكود بنجاح', 'success');
         this.updateStatus('جاهز', 'success');
@@ -661,132 +744,283 @@ function addRandomEffect(element) {
         }, 1500);
     }
     
-    // Open preview modal
-    openPreview() {
-        const previewModal = document.getElementById('previewModal');
-        previewModal.classList.add('active');
-        
-        // Update device display
-        this.updateDeviceDisplay();
-        
-        // Update preview size
-        this.updatePreviewSize();
-        
-        // Disable body scroll
-        document.body.style.overflow = 'hidden';
-    }
-    
-    // Close preview modal
-    closePreview() {
-        const previewModal = document.getElementById('previewModal');
-        previewModal.classList.remove('active');
-        
-        // Enable body scroll
-        document.body.style.overflow = '';
-        
-        // Exit fullscreen if active
-        if (this.isPreviewFullscreen) {
-            this.togglePreviewFullscreen();
+    // Generate preview page with mobile controls
+    generatePreviewPage(htmlContent) {
+        return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>معاينة المشروع - محرر الأكواد</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
-        this.showToast('تم إغلاق المعاينة', 'info');
-    }
-    
-    // Refresh preview
-    refreshPreview() {
-        this.runCode();
-        this.showToast('🔄 تم تحديث المعاينة', 'success');
-    }
-    
-    // Switch preview device
-    switchPreviewDevice(device) {
-        this.previewDevice = device;
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
         
-        // Update active device button
-        document.querySelectorAll('.btn-device').forEach(btn => {
-            if (btn.dataset.device === device) {
-                btn.classList.add('active');
+        .preview-controls {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            background: linear-gradient(45deg, #4a6ee0, #6a4ee0);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .preview-controls h2 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preview-controls .controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .preview-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .preview-controls button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .preview-container {
+            margin-top: 70px;
+            width: 100%;
+            height: calc(100vh - 70px);
+            border: none;
+        }
+        
+        @media (max-width: 768px) {
+            .preview-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.75rem;
+            }
+            
+            .preview-controls h2 {
+                font-size: 1rem;
+            }
+            
+            .preview-controls .controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .preview-controls button {
+                flex: 1;
+                padding: 0.4rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .preview-container {
+                margin-top: 100px;
+                height: calc(100vh - 100px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .preview-controls {
+                padding: 0.5rem;
+            }
+            
+            .preview-controls h2 {
+                font-size: 0.9rem;
+            }
+            
+            .preview-controls button {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.4rem;
+            }
+            
+            .preview-controls button span {
+                display: none;
+            }
+            
+            .preview-controls button i {
+                margin: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="preview-controls">
+        <h2><i class="fas fa-eye"></i> معاينة المشروع</h2>
+        <div class="controls">
+            <button onclick="window.location.reload()" title="تحديث">
+                <i class="fas fa-redo"></i>
+                <span>تحديث</span>
+            </button>
+            <button onclick="window.print()" title="طباعة">
+                <i class="fas fa-print"></i>
+                <span>طباعة</span>
+            </button>
+            <button onclick="toggleFullscreen()" title="ملء الشاشة">
+                <i class="fas fa-expand"></i>
+                <span>ملء الشاشة</span>
+            </button>
+            <button onclick="window.close()" title="إغلاق" style="background: #ef4444;">
+                <i class="fas fa-times"></i>
+                <span>إغلاق</span>
+            </button>
+        </div>
+    </div>
+    
+    <iframe class="preview-container" id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+    
+    <script>
+        // Load the HTML content into the iframe
+        const iframe = document.getElementById('previewFrame');
+        const htmlContent = \`${htmlContent.replace(/`/g, '\\`')}\`;
+        
+        iframe.onload = function() {
+            // Resize iframe to content
+            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+        };
+        
+        // Write content to iframe
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write(htmlContent);
+        iframe.contentWindow.document.close();
+        
+        // Fullscreen function
+        function toggleFullscreen() {
+            const elem = document.documentElement;
+            
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
+                }
             } else {
-                btn.classList.remove('active');
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        }
+        
+        // Handle mobile orientation change
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+            }, 300);
+        });
+        
+        // Handle Escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.fullscreenElement) {
+                    toggleFullscreen();
+                } else {
+                    window.close();
+                }
             }
         });
         
-        // Update device display
-        this.updateDeviceDisplay();
-        
-        // Update preview container class
-        const container = document.querySelector('.preview-frame-container');
-        container.className = 'preview-frame-container';
-        
-        if (this.isPreviewFullscreen) {
-            container.classList.add('fullscreen');
-        } else {
-            container.classList.add(device);
+        // Add developer info
+        console.log('🚀 معاينة المشروع - تم التطوير بواسطة محمود أحمد سعيد');
+        console.log('💻 تم إنشاء هذه الصفحة بواسطة محرر الأكواد المتطور');
+    </script>
+</body>
+</html>`;
+    }
+    
+    // Open preview window
+    openPreviewWindow(previewHTML) {
+        // Close previous preview window if open
+        if (this.previewWindow && !this.previewWindow.closed) {
+            this.previewWindow.close();
         }
         
-        // Update preview size
-        this.updatePreviewSize();
-    }
-    
-    // Update device display
-    updateDeviceDisplay() {
-        const deviceNames = {
-            'desktop': 'جهاز كمبيوتر',
-            'tablet': 'جهاز لوحي',
-            'mobile': 'جوال'
-        };
+        // Generate unique window name
+        const windowName = 'preview_' + Date.now();
         
-        document.getElementById('previewDevice').textContent = deviceNames[this.previewDevice];
-    }
-    
-    // Update preview size display
-    updatePreviewSize() {
-        const container = document.querySelector('.preview-frame-container');
-        if (!container) return;
+        // Calculate window size based on device
+        const isMobile = window.innerWidth <= 768;
+        const width = isMobile ? window.innerWidth : Math.min(1200, window.innerWidth * 0.9);
+        const height = isMobile ? window.innerHeight : Math.min(800, window.innerHeight * 0.9);
+        const left = (window.innerWidth - width) / 2 + window.screenX;
+        const top = (window.innerHeight - height) / 2 + window.screenY;
         
-        const width = container.clientWidth;
-        const height = container.clientHeight;
+        // Open new window
+        this.previewWindow = window.open('', windowName, `
+            width=${width},
+            height=${height},
+            left=${left},
+            top=${top},
+            resizable=yes,
+            scrollbars=yes,
+            toolbar=no,
+            menubar=no,
+            location=no,
+            status=no
+        `);
         
-        document.getElementById('previewSize').textContent = `${width} × ${height}`;
-    }
-    
-    // Update preview stats
-    updatePreviewStats() {
-        const htmlFile = this.files.find(f => f.type === 'html');
-        const cssFile = this.files.find(f => f.type === 'css');
-        const jsFile = this.files.find(f => f.type === 'js');
-        
-        const htmlSize = htmlFile ? Math.round(htmlFile.content.length / 1024 * 100) / 100 : 0;
-        const cssSize = cssFile ? Math.round(cssFile.content.length / 1024 * 100) / 100 : 0;
-        const jsSize = jsFile ? Math.round(jsFile.content.length / 1024 * 100) / 100 : 0;
-        
-        document.getElementById('htmlSize').textContent = htmlSize;
-        document.getElementById('cssSize').textContent = cssSize;
-        document.getElementById('jsSize').textContent = jsSize;
-    }
-    
-    // Toggle preview fullscreen
-    togglePreviewFullscreen() {
-        const container = document.querySelector('.preview-frame-container');
-        const fullscreenBtn = document.getElementById('fullscreenPreviewBtn');
-        
-        this.isPreviewFullscreen = !this.isPreviewFullscreen;
-        
-        if (this.isPreviewFullscreen) {
-            container.classList.add('fullscreen');
-            fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-            fullscreenBtn.title = 'تصغير';
+        if (this.previewWindow) {
+            // Write content to new window
+            this.previewWindow.document.open();
+            this.previewWindow.document.write(previewHTML);
+            this.previewWindow.document.close();
+            
+            // Focus the new window
+            this.previewWindow.focus();
+            
+            // Handle window close
+            this.previewWindow.onbeforeunload = () => {
+                if (this.previewUrl) {
+                    URL.revokeObjectURL(this.previewUrl);
+                    this.previewUrl = null;
+                }
+            };
         } else {
-            container.classList.remove('fullscreen');
-            container.classList.add(this.previewDevice);
-            fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-            fullscreenBtn.title = 'ملء الشاشة';
+            this.showToast('❌ تم منع النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة', 'error');
+            // Fallback: open in new tab
+            const newTab = window.open('', '_blank');
+            if (newTab) {
+                newTab.document.open();
+                newTab.document.write(previewHTML);
+                newTab.document.close();
+                this.previewWindow = newTab;
+            }
         }
-        
-        // Update preview size
-        setTimeout(() => {
-            this.updatePreviewSize();
-        }, 100);
     }
     
     // Save all files
@@ -1183,8 +1417,27 @@ document.addEventListener('fullscreenchange', () => {
 
 // Handle beforeunload
 window.addEventListener('beforeunload', (e) => {
-    // You could add autosave functionality here
-    // For now, just show a warning
+    // Clean up blob URLs
+    if (app.previewUrl) {
+        URL.revokeObjectURL(app.previewUrl);
+    }
+    
+    // Close preview window
+    if (app.previewWindow && !app.previewWindow.closed) {
+        app.previewWindow.close();
+    }
+    
+    // Optional: ask user to save
     // e.preventDefault();
     // e.returnValue = 'هل تريد حفظ التغييرات قبل المغادرة؟';
+});
+
+// Handle page visibility (for mobile)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // Page is hidden (user switched tabs or app)
+        if (window.app) {
+            window.app.closeSidebar();
+        }
+    }
 });
