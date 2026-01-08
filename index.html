@@ -38,6 +38,7 @@
         .loading-content {
             text-align: center;
             color: white;
+            padding: 20px;
         }
         
         .loading-logo {
@@ -52,7 +53,8 @@
         }
         
         .loading-progress {
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             height: 10px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
@@ -75,6 +77,7 @@
             text-align: center;
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.9rem;
+            padding: 0 20px;
         }
         
         @keyframes pulse {
@@ -85,13 +88,12 @@
         @media (max-width: 768px) {
             .loading-logo { font-size: 3rem; }
             .loading-text { font-size: 1.2rem; }
-            .loading-progress { width: 250px; }
         }
         
         @media (max-width: 480px) {
             .loading-logo { font-size: 2.5rem; }
             .loading-text { font-size: 1rem; }
-            .loading-progress { width: 200px; }
+            .developer-signature { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -140,9 +142,6 @@
                 </button>
                 <button class="btn btn-icon" title="تحميل المشروع" id="downloadBtn" aria-label="تحميل المشروع">
                     <i class="fas fa-download"></i>
-                </button>
-                <button class="btn btn-icon" title="وضع ملء الشاشة" id="fullscreenBtn" aria-label="وضع ملء الشاشة">
-                    <i class="fas fa-expand"></i>
                 </button>
                 <div class="theme-toggle">
                     <button class="btn btn-icon" title="تبديل السمة" id="themeToggle" aria-label="تبديل السمة">
@@ -249,7 +248,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="fileName">اسم الملف</label>
-                        <input type="text" id="fileName" class="form-control" placeholder="مثال: index.html">
+                        <input type="text" id="fileName" class="form-control" placeholder="مثال: index.html" value="newfile.html">
                     </div>
                     <div class="form-group">
                         <label for="fileType">نوع الملف</label>
@@ -288,7 +287,7 @@
                     <span id="currentFile">index.html</span>
                 </div>
                 <div class="footer-right">
-                    <span>مطور بواسطة <strong>محمود أحمد سعيد</strong> © 2023</span>
+                    <span>مطور بواسطة <strong>محمود أحمد سعيد</strong></span>
                 </div>
             </div>
         </footer>
@@ -305,7 +304,7 @@
             let progress = 0;
             const progressBar = document.getElementById('progressBar');
             const interval = setInterval(() => {
-                progress += Math.random() * 20;
+                progress += Math.random() * 15 + 5;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
@@ -318,8 +317,8 @@
                             document.getElementById('app').style.display = 'block';
                             
                             // Initialize app
-                            if (typeof app !== 'undefined') {
-                                app.initializeApp();
+                            if (typeof CodeEditor !== 'undefined') {
+                                window.app = new CodeEditor();
                             }
                         }, 500);
                     }, 300);
@@ -327,6 +326,10 @@
                 progressBar.style.width = progress + '%';
             }, 150);
         });
+        
+        // Handle touch events for mobile
+        document.addEventListener('touchstart', function() {}, {passive: true});
+        document.addEventListener('touchmove', function() {}, {passive: true});
     </script>
 </body>
 </html>

@@ -1,39 +1,15 @@
-// Main application
-class CodeEditorApp {
+// Main Code Editor Application
+class CodeEditor {
     constructor() {
-        this.files = [
-            { id: 1, name: 'index.html', type: 'html', content: this.getDefaultHTML(), active: true },
-            { id: 2, name: 'style.css', type: 'css', content: this.getDefaultCSS(), active: true },
-            { id: 3, name: 'script.js', type: 'js', content: this.getDefaultJS(), active: true }
-        ];
-        
+        this.files = [];
         this.currentFileType = 'html';
         this.projectName = 'مشروع جديد';
         this.isFullscreen = false;
         this.theme = localStorage.getItem('codeEditorTheme') || 'light';
         this.previewWindow = null;
-        this.previewUrl = null;
         
-        this.initializeApp();
-    }
-    
-    // Initialize the application
-    initializeApp() {
-        this.setTheme(this.theme);
-        this.setupEventListeners();
-        this.loadSavedProject();
-        this.renderFileList();
-        this.renderEditorTabs();
-        this.setupCodeEditors();
-        this.updateStatus('جاهز', 'success');
-        
-        // Setup mobile gestures
-        this.setupMobileGestures();
-    }
-    
-    // Get default HTML content
-    getDefaultHTML() {
-        return `<!DOCTYPE html>
+        this.defaultFiles = {
+            html: `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -80,12 +56,9 @@ class CodeEditorApp {
     
     <script src="script.js"></script>
 </body>
-</html>`;
-    }
-    
-    // Get default CSS content
-    getDefaultCSS() {
-        return `/* أنماط افتراضية للمشروع */
+</html>`,
+
+            css: `/* أنماط افتراضية للمشروع */
 * {
     margin: 0;
     padding: 0;
@@ -246,74 +219,69 @@ footer {
         width: 90%;
         padding: 0.8rem;
     }
-}`;
-    }
-    
-    // Get default JavaScript content
-    getDefaultJS() {
-        return `// كود JavaScript افتراضي
+}`,
+
+            js: `// كود JavaScript افتراضي
 document.addEventListener('DOMContentLoaded', function() {
     const demoBtn = document.getElementById('demoBtn');
     const demoText = document.getElementById('demoText');
     const featureCards = document.querySelectorAll('.feature-card');
     
     // تفاعل مع زر التجربة
-    demoBtn.addEventListener('click', function() {
-        demoText.textContent = '🎊 ممتاز! أنت تستخدم JavaScript!';
-        demoText.classList.add('active');
-        
-        this.style.background = 'linear-gradient(45deg, #10b981, #34d399)';
-        this.innerHTML = '<i class="fas fa-check"></i> تم التنفيذ!';
-        
-        setTimeout(() => {
-            this.style.background = 'linear-gradient(45deg, #4a6ee0, #6a4ee0)';
-            this.innerHTML = 'جرب التفاعل مرة أخرى';
-            demoText.classList.remove('active');
-            demoText.textContent = '👆 اضغط على الزر أعلاه';
-        }, 2000);
-    });
-    
-    // تفاعل مع بطاقات الميزات
-    featureCards.forEach((card, index) => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-15px) scale(1.05)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-        
-        card.addEventListener('click', function() {
-            const colors = ['#4a6ee0', '#6a4ee0', '#10b981'];
-            const icons = ['fa-code', 'fa-palette', 'fa-magic'];
-            const h3 = this.querySelector('h3');
-            const icon = this.querySelector('i');
+    if (demoBtn) {
+        demoBtn.addEventListener('click', function() {
+            demoText.textContent = '🎊 ممتاز! أنت تستخدم JavaScript!';
+            demoText.classList.add('active');
             
-            const originalText = h3.textContent;
-            const originalIcon = icon.className;
-            
-            h3.textContent = 'مميز!';
-            h3.style.color = colors[index];
-            icon.className = \`fas \${icons[index]} fa-spin\`;
+            this.style.background = 'linear-gradient(45deg, #10b981, #34d399)';
+            this.innerHTML = '<i class="fas fa-check"></i> تم التنفيذ!';
             
             setTimeout(() => {
-                h3.textContent = originalText;
-                h3.style.color = '';
-                icon.className = originalIcon;
-            }, 1000);
+                this.style.background = 'linear-gradient(45deg, #4a6ee0, #6a4ee0)';
+                this.innerHTML = 'جرب التفاعل مرة أخرى';
+                demoText.classList.remove('active');
+                demoText.textContent = '👆 اضغط على الزر أعلاه';
+            }, 2000);
         });
-    });
+    }
+    
+    // تفاعل مع بطاقات الميزات
+    if (featureCards.length > 0) {
+        featureCards.forEach((card, index) => {
+            card.addEventListener('click', function() {
+                const colors = ['#4a6ee0', '#6a4ee0', '#10b981'];
+                const icons = ['fa-code', 'fa-palette', 'fa-magic'];
+                const h3 = this.querySelector('h3');
+                const icon = this.querySelector('i');
+                
+                const originalText = h3.textContent;
+                const originalIcon = icon.className;
+                
+                h3.textContent = 'مميز!';
+                h3.style.color = colors[index];
+                icon.className = \`fas \${icons[index]} fa-spin\`;
+                
+                setTimeout(() => {
+                    h3.textContent = originalText;
+                    h3.style.color = '';
+                    icon.className = originalIcon;
+                }, 1000);
+            });
+        });
+    }
     
     // تأثير التمرير على العنوان
     const header = document.querySelector('header h1');
     
-    window.addEventListener('scroll', function() {
-        const scrollPosition = window.scrollY;
-        const hue = (scrollPosition % 360);
-        header.style.background = \`linear-gradient(45deg, hsl(\${hue}, 100%, 50%), hsl(\${hue + 30}, 100%, 50%))\`;
-        header.style.webkitBackgroundClip = 'text';
-        header.style.backgroundClip = 'text';
-    });
+    if (header) {
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.scrollY;
+            const hue = (scrollPosition % 360);
+            header.style.background = \`linear-gradient(45deg, hsl(\${hue}, 100%, 50%), hsl(\${hue + 30}, 100%, 50%))\`;
+            header.style.webkitBackgroundClip = 'text';
+            header.style.backgroundClip = 'text';
+        });
+    }
     
     console.log('🚀 مرحباً بك في محرر الأكواد!');
     console.log('💻 تم التطوير بواسطة محمود أحمد سعيد');
@@ -328,117 +296,124 @@ function addRandomEffect(element) {
     setTimeout(() => {
         element.classList.remove('animate__animated', \`animate__\${randomEffect}\`);
     }, 1000);
-}`;
+}`
+        };
+        
+        this.initialize();
+    }
+    
+    // Initialize the application
+    initialize() {
+        console.log('جاري تهيئة المحرر...');
+        
+        // Set theme
+        this.setTheme(this.theme);
+        
+        // Load saved project or use defaults
+        this.loadProject();
+        
+        // Setup event listeners
+        this.setupEventListeners();
+        
+        // Render initial UI
+        this.renderFileList();
+        this.renderEditorTabs();
+        this.setupCodeEditors();
+        
+        // Update status
+        this.updateStatus('جاهز', 'success');
+        
+        console.log('تم تهيئة المحرر بنجاح!');
     }
     
     // Setup event listeners
     setupEventListeners() {
-        // Menu toggle
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            this.toggleSidebar();
-        });
+        console.log('جاري إعداد مستمعي الأحداث...');
         
-        // Run code - opens in new window
-        document.getElementById('runBtn').addEventListener('click', () => {
-            this.runCodeInNewWindow();
-        });
+        // Menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => this.toggleSidebar());
+            console.log('تم إعداد زر القائمة');
+        }
+        
+        // Run code
+        const runBtn = document.getElementById('runBtn');
+        if (runBtn) {
+            runBtn.addEventListener('click', () => this.runCode());
+            console.log('تم إعداد زر التشغيل');
+        }
         
         // Save all
-        document.getElementById('saveBtn').addEventListener('click', () => {
-            this.saveAll();
-        });
+        const saveBtn = document.getElementById('saveBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => this.saveAll());
+            console.log('تم إعداد زر الحفظ');
+        }
         
         // Download project
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            this.downloadProject();
-        });
-        
-        // Fullscreen toggle
-        document.getElementById('fullscreenBtn').addEventListener('click', () => {
-            this.toggleFullscreen();
-        });
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', () => this.downloadProject());
+            console.log('تم إعداد زر التحميل');
+        }
         
         // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            this.toggleTheme();
-        });
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => this.toggleTheme());
+            console.log('تم إعداد زر السمة');
+        }
         
         // New file button
-        document.getElementById('newFileBtn').addEventListener('click', () => {
-            this.showNewFileModal();
-        });
+        const newFileBtn = document.getElementById('newFileBtn');
+        if (newFileBtn) {
+            newFileBtn.addEventListener('click', () => this.showNewFileModal());
+            console.log('تم إعداد زر الملف الجديد');
+        }
         
         // Create file button
-        document.getElementById('createFileBtn').addEventListener('click', () => {
-            this.createNewFile();
-        });
+        const createFileBtn = document.getElementById('createFileBtn');
+        if (createFileBtn) {
+            createFileBtn.addEventListener('click', () => this.createNewFile());
+            console.log('تم إعداد زر إنشاء الملف');
+        }
         
         // Close modal buttons
         document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.closeModal();
-            });
+            btn.addEventListener('click', () => this.closeModal());
         });
+        console.log('تم إعداد أزرار إغلاق النافذة');
         
         // Format code buttons
         document.querySelectorAll('[data-action="format"]').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const lang = e.target.dataset.lang;
+                const lang = e.target.closest('button').dataset.lang;
                 this.formatCode(lang);
             });
         });
+        console.log('تم إعداد أزرار التنسيق');
         
         // Clear code buttons
         document.querySelectorAll('[data-action="clear"]').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const lang = e.target.dataset.lang;
+                const lang = e.target.closest('button').dataset.lang;
                 if (confirm(`هل تريد مسح محتوى ${lang.toUpperCase()}؟`)) {
                     this.clearEditor(lang);
                 }
             });
         });
+        console.log('تم إعداد أزرار المسح');
         
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Save with Ctrl+S
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                this.saveAll();
-            }
-            
-            // Run with Ctrl+R
-            if (e.ctrlKey && e.key === 'r') {
-                e.preventDefault();
-                this.runCodeInNewWindow();
-            }
-            
-            // New file with Ctrl+N
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                this.showNewFileModal();
-            }
-            
-            // Format code with Ctrl+Shift+F
-            if (e.ctrlKey && e.shiftKey && e.key === 'F') {
-                e.preventDefault();
-                this.formatCode(this.currentFileType);
-            }
-            
-            // Close sidebar with Escape
-            if (e.key === 'Escape') {
-                this.closeSidebar();
-            }
-        });
-        
-        // Close sidebar when clicking outside on mobile
+        // Handle clicks outside sidebar on mobile
         document.addEventListener('click', (e) => {
             const sidebar = document.getElementById('sidebar');
             const menuToggle = document.getElementById('menuToggle');
             
             if (window.innerWidth <= 768 && 
-                sidebar.classList.contains('open') && 
+                sidebar && sidebar.classList.contains('open') && 
                 !sidebar.contains(e.target) && 
-                !menuToggle.contains(e.target)) {
+                menuToggle && !menuToggle.contains(e.target)) {
                 this.closeSidebar();
             }
         });
@@ -448,111 +423,150 @@ function addRandomEffect(element) {
             this.handleResize();
         });
         
-        // Handle beforeunload to close preview windows
-        window.addEventListener('beforeunload', () => {
-            if (this.previewWindow && !this.previewWindow.closed) {
-                this.previewWindow.close();
+        // Handle orientation change on mobile
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.handleResize();
+            }, 300);
+        });
+        
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Save with Ctrl+S
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                this.saveAll();
+            }
+            
+            // Run with Ctrl+Enter
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                this.runCode();
+            }
+            
+            // New file with Ctrl+N
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                this.showNewFileModal();
+            }
+            
+            // Close sidebar with Escape
+            if (e.key === 'Escape') {
+                this.closeSidebar();
+                this.closeModal();
             }
         });
-    }
-    
-    // Setup mobile gestures
-    setupMobileGestures() {
-        let startX = 0;
-        let startY = 0;
         
-        document.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-        }, { passive: true });
-        
-        document.addEventListener('touchend', (e) => {
-            if (!startX || !startY) return;
-            
-            const endX = e.changedTouches[0].clientX;
-            const endY = e.changedTouches[0].clientY;
-            
-            const diffX = startX - endX;
-            const diffY = startY - endY;
-            
-            // Swipe right to left to open sidebar on mobile
-            if (Math.abs(diffX) > Math.abs(diffY) && diffX > 50 && window.innerWidth <= 768) {
-                this.openSidebar();
-            }
-            
-            // Swipe left to right to close sidebar
-            if (Math.abs(diffX) > Math.abs(diffY) && diffX < -50 && window.innerWidth <= 768) {
-                this.closeSidebar();
-            }
-            
-            startX = 0;
-            startY = 0;
-        }, { passive: true });
+        console.log('تم إعداد جميع مستمعي الأحداث');
     }
     
     // Handle window resize
     handleResize() {
+        // Adjust textarea font size for mobile
+        const isMobile = window.innerWidth <= 768;
+        const textareas = document.querySelectorAll('.code-editor textarea');
+        
+        textareas.forEach(textarea => {
+            textarea.style.fontSize = isMobile ? '14px' : '15px';
+        });
+        
         // Close sidebar on resize to desktop
         if (window.innerWidth > 768) {
             this.closeSidebar();
         }
     }
     
-    // Toggle sidebar
-    toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('open');
+    // Load project from localStorage or create default
+    loadProject() {
+        console.log('جاري تحميل المشروع...');
         
-        // Prevent body scroll when sidebar is open on mobile
-        if (window.innerWidth <= 768) {
-            if (sidebar.classList.contains('open')) {
-                document.body.style.overflow = 'hidden';
+        try {
+            const saved = localStorage.getItem('codeEditorProject');
+            
+            if (saved) {
+                const projectData = JSON.parse(saved);
+                this.files = projectData.files || this.createDefaultFiles();
+                this.projectName = projectData.projectName || 'مشروع جديد';
+                this.theme = projectData.theme || 'light';
+                
+                console.log('تم تحميل المشروع من التخزين المحلي');
             } else {
-                document.body.style.overflow = '';
+                this.files = this.createDefaultFiles();
+                console.log('تم إنشاء مشروع جديد افتراضي');
             }
+            
+            // Update project name in UI
+            const projectNameElement = document.getElementById('projectName');
+            if (projectNameElement) {
+                projectNameElement.textContent = this.projectName;
+            }
+        } catch (error) {
+            console.error('خطأ في تحميل المشروع:', error);
+            this.files = this.createDefaultFiles();
+            this.showToast('❌ حدث خطأ في تحميل المشروع المحفوظ', 'error');
         }
     }
     
-    // Open sidebar
-    openSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.add('open');
-        
-        if (window.innerWidth <= 768) {
-            document.body.style.overflow = 'hidden';
-        }
-    }
-    
-    // Close sidebar
-    closeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.remove('open');
-        document.body.style.overflow = '';
+    // Create default files
+    createDefaultFiles() {
+        return [
+            { 
+                id: 1, 
+                name: 'index.html', 
+                type: 'html', 
+                content: this.defaultFiles.html,
+                active: true 
+            },
+            { 
+                id: 2, 
+                name: 'style.css', 
+                type: 'css', 
+                content: this.defaultFiles.css,
+                active: true 
+            },
+            { 
+                id: 3, 
+                name: 'script.js', 
+                type: 'js', 
+                content: this.defaultFiles.js,
+                active: true 
+            }
+        ];
     }
     
     // Render file list
     renderFileList() {
+        console.log('جاري عرض قائمة الملفات...');
+        
         const fileList = document.getElementById('fileList');
+        if (!fileList) {
+            console.error('عنصر قائمة الملفات غير موجود');
+            return;
+        }
+        
         fileList.innerHTML = '';
         
         this.files.forEach(file => {
             const li = document.createElement('li');
             li.className = `file-item ${this.currentFileType === file.type ? 'active' : ''}`;
+            
+            const iconClass = file.type === 'html' ? 'html5' :
+                            file.type === 'css' ? 'css3-alt' :
+                            file.type === 'js' ? 'js-square' : 'file-alt';
+            
             li.innerHTML = `
-                <div>
-                    <i class="fab fa-${file.type === 'html' ? 'html5' : 
-                                      file.type === 'css' ? 'css3-alt' : 
-                                      file.type === 'js' ? 'js-square' : 
-                                      'file-alt'} file-icon ${file.type}"></i>
-                    ${file.name}
+                <div class="file-info">
+                    <i class="fab fa-${iconClass} file-icon ${file.type}"></i>
+                    <span class="file-name">${file.name}</span>
                 </div>
                 <div class="file-actions">
-                    <button class="btn btn-icon btn-small" onclick="app.deleteFile(${file.id})" title="حذف">
+                    <button class="btn btn-icon btn-small delete-file" data-id="${file.id}" title="حذف">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             `;
             
+            // Add click event to switch to file
             li.addEventListener('click', (e) => {
                 if (!e.target.closest('.file-actions')) {
                     this.switchToFile(file.type);
@@ -565,55 +579,100 @@ function addRandomEffect(element) {
             fileList.appendChild(li);
         });
         
-        // Update current file in footer
-        const currentFile = this.files.find(f => f.type === this.currentFileType);
-        if (currentFile) {
-            document.getElementById('currentFile').textContent = currentFile.name;
-        }
+        // Add event listeners to delete buttons
+        fileList.querySelectorAll('.delete-file').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const fileId = parseInt(e.currentTarget.dataset.id);
+                this.deleteFile(fileId);
+            });
+        });
+        
+        console.log('تم عرض قائمة الملفات');
     }
     
     // Render editor tabs
     renderEditorTabs() {
+        console.log('جاري عرض علامات التبويب...');
+        
         const editorTabs = document.getElementById('editorTabs');
+        if (!editorTabs) {
+            console.error('عنصر علامات التبويب غير موجود');
+            return;
+        }
+        
         editorTabs.innerHTML = '';
         
-        this.files.forEach(file => {
-            if (file.active) {
-                const tab = document.createElement('div');
-                tab.className = `tab ${this.currentFileType === file.type ? 'active' : ''}`;
-                tab.innerHTML = `
-                    <i class="fab fa-${file.type === 'html' ? 'html5' : 
-                                      file.type === 'css' ? 'css3-alt' : 
-                                      'js-square'} ${file.type}"></i>
-                    ${file.name}
-                    <span class="tab-close" onclick="app.closeTab('${file.type}')">
-                        <i class="fas fa-times"></i>
-                    </span>
-                `;
-                
-                tab.addEventListener('click', () => {
+        const activeFiles = this.files.filter(f => f.active);
+        
+        if (activeFiles.length === 0) {
+            console.log('لا توجد ملفات نشطة لعرضها');
+            return;
+        }
+        
+        activeFiles.forEach(file => {
+            const tab = document.createElement('div');
+            tab.className = `tab ${this.currentFileType === file.type ? 'active' : ''}`;
+            
+            const iconClass = file.type === 'html' ? 'html5' :
+                            file.type === 'css' ? 'css3-alt' : 'js-square';
+            
+            tab.innerHTML = `
+                <i class="fab fa-${iconClass} ${file.type}"></i>
+                <span class="tab-name">${file.name}</span>
+                ${activeFiles.length > 1 ? `<span class="tab-close" data-type="${file.type}"><i class="fas fa-times"></i></span>` : ''}
+            `;
+            
+            // Add click event to switch to file
+            tab.addEventListener('click', (e) => {
+                if (!e.target.closest('.tab-close')) {
                     this.switchToFile(file.type);
+                }
+            });
+            
+            // Add click event to close tab
+            const closeBtn = tab.querySelector('.tab-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.closeTab(file.type);
                 });
-                
-                editorTabs.appendChild(tab);
             }
+            
+            editorTabs.appendChild(tab);
         });
+        
+        console.log('تم عرض علامات التبويب');
     }
     
     // Setup code editors
     setupCodeEditors() {
+        console.log('جاري إعداد المحررات...');
+        
         // Initialize editors with content
         this.files.forEach(file => {
             const editor = document.getElementById(`${file.type}Editor`);
             if (editor) {
-                const textarea = document.createElement('textarea');
+                let textarea = editor.querySelector('textarea');
+                
+                if (!textarea) {
+                    textarea = document.createElement('textarea');
+                    textarea.spellcheck = false;
+                    textarea.autocomplete = 'off';
+                    textarea.autocorrect = 'off';
+                    textarea.autocapitalize = 'off';
+                    
+                    // Set mobile-friendly styles
+                    textarea.style.fontSize = window.innerWidth <= 768 ? '14px' : '15px';
+                    textarea.style.lineHeight = '1.6';
+                    textarea.style.fontFamily = "'Cairo', 'Courier New', monospace";
+                    
+                    editor.appendChild(textarea);
+                }
+                
                 textarea.value = file.content;
-                textarea.spellcheck = false;
                 
-                // Improve mobile editing experience
-                textarea.style.fontSize = window.innerWidth <= 480 ? '13px' : '14px';
-                textarea.style.lineHeight = '1.6';
-                
+                // Add input event listener
                 textarea.addEventListener('input', (e) => {
                     this.saveFileContent(file.type, e.target.value);
                 });
@@ -626,26 +685,29 @@ function addRandomEffect(element) {
                         const start = textarea.selectionStart;
                         const end = textarea.selectionEnd;
                         
-                        // Insert tab
+                        // Insert 2 spaces
                         textarea.value = textarea.value.substring(0, start) + '  ' + textarea.value.substring(end);
                         
                         // Move cursor
                         textarea.selectionStart = textarea.selectionEnd = start + 2;
+                        
+                        // Trigger input event
+                        textarea.dispatchEvent(new Event('input'));
                     }
                 });
-                
-                // Replace the editor div with textarea
-                editor.innerHTML = '';
-                editor.appendChild(textarea);
             }
         });
         
         // Show the current editor
         this.showEditor(this.currentFileType);
+        
+        console.log('تم إعداد المحررات');
     }
     
     // Show specific editor
     showEditor(type) {
+        console.log(`جاري عرض محرر ${type}...`);
+        
         // Hide all editors
         document.querySelectorAll('.editor-section').forEach(section => {
             section.classList.remove('active');
@@ -663,12 +725,25 @@ function addRandomEffect(element) {
         // Update UI
         this.renderFileList();
         this.renderEditorTabs();
+        
+        // Update current file in footer
+        const currentFile = this.files.find(f => f.type === type);
+        if (currentFile) {
+            const currentFileElement = document.getElementById('currentFile');
+            if (currentFileElement) {
+                currentFileElement.textContent = currentFile.name;
+            }
+        }
+        
+        console.log(`تم عرض محرر ${type}`);
     }
     
     // Switch to a file
     switchToFile(type) {
-        this.currentFileType = type;
-        this.showEditor(type);
+        if (this.currentFileType !== type) {
+            this.currentFileType = type;
+            this.showEditor(type);
+        }
     }
     
     // Save file content
@@ -679,8 +754,9 @@ function addRandomEffect(element) {
         }
     }
     
-    // Run code in new window
-    runCodeInNewWindow() {
+    // Run code
+    runCode() {
+        console.log('جاري تشغيل الكود...');
         this.updateStatus('جاري التشغيل...', 'warning');
         
         const htmlFile = this.files.find(f => f.type === 'html');
@@ -721,250 +797,32 @@ function addRandomEffect(element) {
         
         // Create a blob URL for the HTML content
         const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-        this.previewUrl = URL.createObjectURL(blob);
-        
-        // Generate preview HTML with mobile-friendly features
-        const previewHTML = this.generatePreviewPage(htmlContent);
+        const previewUrl = URL.createObjectURL(blob);
         
         // Open in new window/tab
-        this.openPreviewWindow(previewHTML);
+        this.openPreviewWindow(previewUrl);
         
         this.showToast('✅ تم تشغيل الكود بنجاح', 'success');
         this.updateStatus('جاهز', 'success');
         
         // Update run button temporarily
         const runBtn = document.getElementById('runBtn');
-        const originalHTML = runBtn.innerHTML;
-        runBtn.innerHTML = '<i class="fas fa-check"></i>';
-        runBtn.disabled = true;
-        
-        setTimeout(() => {
-            runBtn.innerHTML = originalHTML;
-            runBtn.disabled = false;
-        }, 1500);
-    }
-    
-    // Generate preview page with mobile controls
-    generatePreviewPage(htmlContent) {
-        return `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>معاينة المشروع - محرر الأكواد</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        .preview-controls {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            background: linear-gradient(45deg, #4a6ee0, #6a4ee0);
-            color: white;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .preview-controls h2 {
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .preview-controls .controls {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .preview-controls button {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .preview-controls button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .preview-container {
-            margin-top: 70px;
-            width: 100%;
-            height: calc(100vh - 70px);
-            border: none;
-        }
-        
-        @media (max-width: 768px) {
-            .preview-controls {
-                flex-direction: column;
-                gap: 0.5rem;
-                padding: 0.75rem;
-            }
+        if (runBtn) {
+            const originalHTML = runBtn.innerHTML;
+            runBtn.innerHTML = '<i class="fas fa-check"></i>';
+            runBtn.disabled = true;
             
-            .preview-controls h2 {
-                font-size: 1rem;
-            }
-            
-            .preview-controls .controls {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .preview-controls button {
-                flex: 1;
-                padding: 0.4rem 0.5rem;
-                font-size: 0.9rem;
-            }
-            
-            .preview-container {
-                margin-top: 100px;
-                height: calc(100vh - 100px);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .preview-controls {
-                padding: 0.5rem;
-            }
-            
-            .preview-controls h2 {
-                font-size: 0.9rem;
-            }
-            
-            .preview-controls button {
-                font-size: 0.8rem;
-                padding: 0.3rem 0.4rem;
-            }
-            
-            .preview-controls button span {
-                display: none;
-            }
-            
-            .preview-controls button i {
-                margin: 0;
-            }
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="preview-controls">
-        <h2><i class="fas fa-eye"></i> معاينة المشروع</h2>
-        <div class="controls">
-            <button onclick="window.location.reload()" title="تحديث">
-                <i class="fas fa-redo"></i>
-                <span>تحديث</span>
-            </button>
-            <button onclick="window.print()" title="طباعة">
-                <i class="fas fa-print"></i>
-                <span>طباعة</span>
-            </button>
-            <button onclick="toggleFullscreen()" title="ملء الشاشة">
-                <i class="fas fa-expand"></i>
-                <span>ملء الشاشة</span>
-            </button>
-            <button onclick="window.close()" title="إغلاق" style="background: #ef4444;">
-                <i class="fas fa-times"></i>
-                <span>إغلاق</span>
-            </button>
-        </div>
-    </div>
-    
-    <iframe class="preview-container" id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
-    
-    <script>
-        // Load the HTML content into the iframe
-        const iframe = document.getElementById('previewFrame');
-        const htmlContent = \`${htmlContent.replace(/`/g, '\\`')}\`;
-        
-        iframe.onload = function() {
-            // Resize iframe to content
-            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-        };
-        
-        // Write content to iframe
-        iframe.contentWindow.document.open();
-        iframe.contentWindow.document.write(htmlContent);
-        iframe.contentWindow.document.close();
-        
-        // Fullscreen function
-        function toggleFullscreen() {
-            const elem = document.documentElement;
-            
-            if (!document.fullscreenElement) {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-            }
-        }
-        
-        // Handle mobile orientation change
-        window.addEventListener('orientationchange', function() {
             setTimeout(() => {
-                iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-            }, 300);
-        });
-        
-        // Handle Escape key to close
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (document.fullscreenElement) {
-                    toggleFullscreen();
-                } else {
-                    window.close();
-                }
-            }
-        });
-        
-        // Add developer info
-        console.log('🚀 معاينة المشروع - تم التطوير بواسطة محمود أحمد سعيد');
-        console.log('💻 تم إنشاء هذه الصفحة بواسطة محرر الأكواد المتطور');
-    </script>
-</body>
-</html>`;
+                runBtn.innerHTML = originalHTML;
+                runBtn.disabled = false;
+            }, 1500);
+        }
     }
     
     // Open preview window
-    openPreviewWindow(previewHTML) {
+    openPreviewWindow(url) {
+        console.log('جاري فتح نافذة المعاينة...');
+        
         // Close previous preview window if open
         if (this.previewWindow && !this.previewWindow.closed) {
             this.previewWindow.close();
@@ -977,47 +835,42 @@ function addRandomEffect(element) {
         const isMobile = window.innerWidth <= 768;
         const width = isMobile ? window.innerWidth : Math.min(1200, window.innerWidth * 0.9);
         const height = isMobile ? window.innerHeight : Math.min(800, window.innerHeight * 0.9);
-        const left = (window.innerWidth - width) / 2 + window.screenX;
-        const top = (window.innerHeight - height) / 2 + window.screenY;
         
-        // Open new window
-        this.previewWindow = window.open('', windowName, `
-            width=${width},
-            height=${height},
-            left=${left},
-            top=${top},
-            resizable=yes,
-            scrollbars=yes,
-            toolbar=no,
-            menubar=no,
-            location=no,
-            status=no
-        `);
+        // For mobile, use full screen
+        if (isMobile) {
+            this.previewWindow = window.open(url, windowName, 'fullscreen=yes');
+        } else {
+            // For desktop, use centered window
+            const left = (window.innerWidth - width) / 2 + window.screenX;
+            const top = (window.innerHeight - height) / 2 + window.screenY;
+            
+            this.previewWindow = window.open(url, windowName, `
+                width=${width},
+                height=${height},
+                left=${left},
+                top=${top},
+                resizable=yes,
+                scrollbars=yes,
+                toolbar=no,
+                menubar=no,
+                location=no,
+                status=no
+            `);
+        }
         
         if (this.previewWindow) {
-            // Write content to new window
-            this.previewWindow.document.open();
-            this.previewWindow.document.write(previewHTML);
-            this.previewWindow.document.close();
-            
             // Focus the new window
             this.previewWindow.focus();
             
             // Handle window close
             this.previewWindow.onbeforeunload = () => {
-                if (this.previewUrl) {
-                    URL.revokeObjectURL(this.previewUrl);
-                    this.previewUrl = null;
-                }
+                URL.revokeObjectURL(url);
             };
         } else {
             this.showToast('❌ تم منع النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة', 'error');
             // Fallback: open in new tab
-            const newTab = window.open('', '_blank');
+            const newTab = window.open(url, '_blank');
             if (newTab) {
-                newTab.document.open();
-                newTab.document.write(previewHTML);
-                newTab.document.close();
                 this.previewWindow = newTab;
             }
         }
@@ -1025,58 +878,48 @@ function addRandomEffect(element) {
     
     // Save all files
     saveAll() {
+        console.log('جاري حفظ المشروع...');
         this.updateStatus('جاري الحفظ...', 'warning');
         
         // Save to localStorage
         const projectData = {
             files: this.files,
             projectName: this.projectName,
-            theme: this.theme
+            theme: this.theme,
+            lastSaved: new Date().toISOString()
         };
         
-        localStorage.setItem('codeEditorProject', JSON.stringify(projectData));
-        
-        this.showToast('💾 تم حفظ المشروع بنجاح', 'success');
-        this.updateStatus('جاهز', 'success');
-        
-        // Update save button temporarily
-        const saveBtn = document.getElementById('saveBtn');
-        const originalHTML = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-        saveBtn.disabled = true;
-        
-        setTimeout(() => {
-            saveBtn.innerHTML = originalHTML;
-            saveBtn.disabled = false;
-        }, 1500);
-    }
-    
-    // Load saved project
-    loadSavedProject() {
-        const saved = localStorage.getItem('codeEditorProject');
-        if (saved) {
-            try {
-                const projectData = JSON.parse(saved);
-                this.files = projectData.files || this.files;
-                this.projectName = projectData.projectName || this.projectName;
-                this.theme = projectData.theme || this.theme;
+        try {
+            localStorage.setItem('codeEditorProject', JSON.stringify(projectData));
+            
+            this.showToast('💾 تم حفظ المشروع بنجاح', 'success');
+            this.updateStatus('جاهز', 'success');
+            
+            // Update save button temporarily
+            const saveBtn = document.getElementById('saveBtn');
+            if (saveBtn) {
+                const originalHTML = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+                saveBtn.disabled = true;
                 
-                document.getElementById('projectName').textContent = this.projectName;
-                this.setTheme(this.theme);
-                
-                this.showToast('📂 تم تحميل المشروع المحفوظ', 'success');
-            } catch (e) {
-                console.error('خطأ في تحميل المشروع:', e);
-                this.showToast('❌ خطأ في تحميل المشروع المحفوظ', 'error');
+                setTimeout(() => {
+                    saveBtn.innerHTML = originalHTML;
+                    saveBtn.disabled = false;
+                }, 1500);
             }
+        } catch (error) {
+            console.error('خطأ في حفظ المشروع:', error);
+            this.showToast('❌ حدث خطأ في حفظ المشروع', 'error');
+            this.updateStatus('خطأ', 'error');
         }
     }
     
     // Download project
     downloadProject() {
+        console.log('جاري تحميل المشروع...');
         this.updateStatus('جاري تحضير الملف...', 'warning');
         
-        // Create a ZIP file with all files
+        // Create project data
         const projectData = {
             files: this.files,
             projectName: this.projectName,
@@ -1094,45 +937,79 @@ function addRandomEffect(element) {
         downloadLink.click();
         document.body.removeChild(downloadLink);
         
+        // Clean up URL
+        setTimeout(() => {
+            URL.revokeObjectURL(downloadLink.href);
+        }, 1000);
+        
         this.showToast('📦 تم تحميل المشروع', 'success');
         this.updateStatus('جاهز', 'success');
     }
     
     // Show new file modal
     showNewFileModal() {
-        document.getElementById('newFileModal').classList.add('active');
-        document.getElementById('fileName').focus();
+        console.log('جاري عرض نافذة الملف الجديد...');
+        const modal = document.getElementById('newFileModal');
+        if (modal) {
+            modal.classList.add('active');
+            
+            // Focus on file name input
+            const fileNameInput = document.getElementById('fileName');
+            if (fileNameInput) {
+                setTimeout(() => {
+                    fileNameInput.focus();
+                }, 100);
+            }
+        }
     }
     
     // Close modal
     closeModal() {
-        document.getElementById('newFileModal').classList.remove('active');
+        console.log('جاري إغلاق النافذة...');
+        const modal = document.getElementById('newFileModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
         
         // Reset form
-        document.getElementById('fileName').value = '';
-        document.getElementById('fileContent').value = '';
+        const fileNameInput = document.getElementById('fileName');
+        const fileContentTextarea = document.getElementById('fileContent');
+        
+        if (fileNameInput) fileNameInput.value = 'newfile.html';
+        if (fileContentTextarea) fileContentTextarea.value = '';
     }
     
     // Create new file
     createNewFile() {
-        const name = document.getElementById('fileName').value.trim();
-        const type = document.getElementById('fileType').value;
-        const content = document.getElementById('fileContent').value;
+        console.log('جاري إنشاء ملف جديد...');
+        
+        const fileNameInput = document.getElementById('fileName');
+        const fileTypeSelect = document.getElementById('fileType');
+        const fileContentTextarea = document.getElementById('fileContent');
+        
+        if (!fileNameInput || !fileTypeSelect) {
+            this.showToast('❌ حدث خطأ في إنشاء الملف', 'error');
+            return;
+        }
+        
+        const name = fileNameInput.value.trim();
+        const type = fileTypeSelect.value;
+        const content = fileContentTextarea ? fileContentTextarea.value : '';
         
         if (!name) {
             this.showToast('❌ يرجى إدخال اسم الملف', 'error');
             return;
         }
         
-        // Check if file with same type already exists
-        const existingFile = this.files.find(f => f.type === type);
+        // Check if file with same name already exists
+        const existingFile = this.files.find(f => f.name === name);
         if (existingFile) {
-            if (!confirm(`يوجد ملف ${type} بالفعل. هل تريد استبداله؟`)) {
+            if (!confirm(`يوجد ملف باسم "${name}" بالفعل. هل تريد استبداله؟`)) {
                 return;
             }
             
             // Remove existing file
-            this.files = this.files.filter(f => f.type !== type);
+            this.files = this.files.filter(f => f.name !== name);
         }
         
         const newFile = {
@@ -1153,6 +1030,8 @@ function addRandomEffect(element) {
     
     // Delete file
     deleteFile(fileId) {
+        console.log(`جاري حذف الملف رقم ${fileId}...`);
+        
         const fileIndex = this.files.findIndex(f => f.id === fileId);
         if (fileIndex === -1) return;
         
@@ -1182,6 +1061,8 @@ function addRandomEffect(element) {
     
     // Close tab
     closeTab(type) {
+        console.log(`جاري إغلاق علامة التبويب ${type}...`);
+        
         const fileIndex = this.files.findIndex(f => f.type === type);
         if (fileIndex === -1) return;
         
@@ -1193,8 +1074,11 @@ function addRandomEffect(element) {
             if (nextActiveFile) {
                 this.switchToFile(nextActiveFile.type);
             } else {
-                // If no active files, show message
-                this.showToast('⚠️ لا توجد ملفات مفتوحة', 'warning');
+                // If no active files, activate the first file
+                if (this.files.length > 0) {
+                    this.files[0].active = true;
+                    this.switchToFile(this.files[0].type);
+                }
             }
         }
         
@@ -1203,6 +1087,8 @@ function addRandomEffect(element) {
     
     // Format code
     formatCode(type) {
+        console.log(`جاري تنسيق كود ${type}...`);
+        
         const editor = document.querySelector(`#${type}Editor textarea`);
         if (!editor) return;
         
@@ -1232,9 +1118,9 @@ function addRandomEffect(element) {
     
     // Format HTML
     formatHTML(html) {
-        // Simple HTML formatting (for demonstration)
+        // Simple HTML formatting
         let formatted = html
-            .replace(/></g, '>\n<')
+            .replace(/>\s+</g, '>\n<')
             .replace(/\s+/g, ' ')
             .replace(/\s\s+/g, ' ');
         
@@ -1281,12 +1167,13 @@ function addRandomEffect(element) {
     // Format JavaScript
     formatJS(js) {
         // For now, just return the original
-        // In a real app, you would use a proper JS formatter
         return js;
     }
     
     // Clear editor
     clearEditor(type) {
+        console.log(`جاري مسح محرر ${type}...`);
+        
         const editor = document.querySelector(`#${type}Editor textarea`);
         if (editor) {
             editor.value = '';
@@ -1295,41 +1182,37 @@ function addRandomEffect(element) {
         }
     }
     
-    // Toggle fullscreen
-    toggleFullscreen() {
-        const app = document.getElementById('app');
-        
-        if (!this.isFullscreen) {
-            if (app.requestFullscreen) {
-                app.requestFullscreen();
-            } else if (app.webkitRequestFullscreen) {
-                app.webkitRequestFullscreen();
-            } else if (app.mozRequestFullScreen) {
-                app.mozRequestFullScreen();
-            } else if (app.msRequestFullscreen) {
-                app.msRequestFullscreen();
-            }
+    // Toggle sidebar
+    toggleSidebar() {
+        console.log('جاري تبديل القائمة الجانبية...');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.classList.toggle('open');
             
-            document.getElementById('fullscreenBtn').innerHTML = '<i class="fas fa-compress"></i>';
-            this.isFullscreen = true;
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
+            // Prevent body scroll when sidebar is open on mobile
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('open')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
             }
-            
-            document.getElementById('fullscreenBtn').innerHTML = '<i class="fas fa-expand"></i>';
-            this.isFullscreen = false;
+        }
+    }
+    
+    // Close sidebar
+    closeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.classList.remove('open');
+            document.body.style.overflow = '';
         }
     }
     
     // Toggle theme
     toggleTheme() {
+        console.log('جاري تبديل السمة...');
+        
         if (this.theme === 'light') {
             this.setTheme('dark');
         } else {
@@ -1344,15 +1227,23 @@ function addRandomEffect(element) {
         localStorage.setItem('codeEditorTheme', theme);
         
         // Update theme button icon
-        const themeIcon = document.getElementById('themeToggle').querySelector('i');
-        themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        const themeIcon = document.querySelector('#themeToggle i');
+        if (themeIcon) {
+            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
         
         this.showToast(`تم التبديل إلى الوضع ${theme === 'dark' ? 'الداكن' : 'الفاتح'}`, 'success');
     }
     
     // Show toast notification
     showToast(message, type = 'info') {
+        console.log(`عرض إشعار: ${message}`);
+        
         const toastContainer = document.getElementById('toastContainer');
+        if (!toastContainer) {
+            console.error('حاوية الإشعارات غير موجودة');
+            return;
+        }
         
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
@@ -1364,7 +1255,7 @@ function addRandomEffect(element) {
         
         toast.innerHTML = `
             <i class="${icon} toast-icon"></i>
-            <span>${message}</span>
+            <span class="toast-message">${message}</span>
         `;
         
         toastContainer.appendChild(toast);
@@ -1385,59 +1276,51 @@ function addRandomEffect(element) {
         const statusText = document.getElementById('statusText');
         const statusIcon = document.getElementById('statusIcon');
         
-        statusText.textContent = text;
-        statusIcon.className = 'fas fa-circle';
-        
-        if (type === 'success') {
+        if (statusText) statusText.textContent = text;
+        if (statusIcon) {
+            statusIcon.className = 'fas fa-circle';
             statusIcon.style.color = 'var(--success-color)';
-        } else if (type === 'warning') {
-            statusIcon.style.color = 'var(--warning-color)';
-            statusIcon.classList.add('saving');
-        } else if (type === 'error') {
-            statusIcon.style.color = 'var(--danger-color)';
-            statusIcon.classList.add('offline');
-        } else {
-            statusIcon.style.color = 'var(--info-color)';
+            
+            if (type === 'warning') {
+                statusIcon.style.color = 'var(--warning-color)';
+                statusIcon.classList.add('saving');
+            } else if (type === 'error') {
+                statusIcon.style.color = 'var(--danger-color)';
+                statusIcon.classList.add('offline');
+            } else {
+                statusIcon.classList.remove('saving', 'offline');
+            }
         }
     }
 }
 
 // Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new CodeEditorApp();
-});
-
-// Handle fullscreen change
-document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) {
-        app.isFullscreen = false;
-        document.getElementById('fullscreenBtn').innerHTML = '<i class="fas fa-expand"></i>';
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('صفحة محرر الأكواد جاهزة للتهيئة');
+    
+    // Fix for mobile viewport height
+    function setViewportHeight() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
+    
+    // Set initial height
+    setViewportHeight();
+    
+    // Update on resize
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', setViewportHeight);
+    
+    // The app will be initialized by the loading screen script
+    console.log('جاهز لتحميل التطبيق...');
 });
 
 // Handle beforeunload
-window.addEventListener('beforeunload', (e) => {
+window.addEventListener('beforeunload', function(e) {
     // Clean up blob URLs
-    if (app.previewUrl) {
-        URL.revokeObjectURL(app.previewUrl);
-    }
-    
-    // Close preview window
-    if (app.previewWindow && !app.previewWindow.closed) {
-        app.previewWindow.close();
-    }
-    
-    // Optional: ask user to save
-    // e.preventDefault();
-    // e.returnValue = 'هل تريد حفظ التغييرات قبل المغادرة؟';
+    // Note: We can't clean up here because we don't have access to the preview URL
+    // This would need to be handled differently in a real app
 });
 
-// Handle page visibility (for mobile)
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // Page is hidden (user switched tabs or app)
-        if (window.app) {
-            window.app.closeSidebar();
-        }
-    }
-});
+// Make CodeEditor available globally
+window.CodeEditor = CodeEditor;
