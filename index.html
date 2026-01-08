@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الأكواد المتطور - مطور محمود أحمد سعيد</title>
+    <meta name="description" content="محرر أكواد متطور يدعم HTML، CSS، JavaScript مع معاينة مباشرة">
+    <meta name="author" content="محمود أحمد سعيد">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+    
+    <style>
+        /* Loading screen styles */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0c0e2a 0%, #1a1b3a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-text {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .loading-progress {
+            width: 300px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4a6ee0, #6a4ee0);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+        
+        .developer-signature {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @media (max-width: 768px) {
+            .loading-logo { font-size: 3rem; }
+            .loading-text { font-size: 1.2rem; }
+            .loading-progress { width: 250px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">💻</div>
+            <h1 class="loading-text">محرر الأكواد المتطور</h1>
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="progressBar"></div>
+            </div>
+            <div class="developer-signature">
+                مطور بواسطة: محمود أحمد سعيد
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <h1>محرر الأكواد</h1>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                <div class="project-name">
+                    <i class="fas fa-folder"></i>
+                    <span id="projectName">مشروع جديد</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <button class="btn btn-icon" title="تشغيل الكود" id="runBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="btn btn-icon" title="حفظ الكل" id="saveBtn">
+                    <i class="fas fa-save"></i>
+                </button>
+                <button class="btn btn-icon" title="تحميل المشروع" id="downloadBtn">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="btn btn-icon" title="وضع ملء الشاشة" id="fullscreenBtn">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <div class="theme-toggle">
+                    <button class="btn btn-icon" title="تبديل السمة" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h3><i class="fas fa-folder-open"></i> الملفات</h3>
+                    <button class="btn btn-small" id="newFileBtn">
+                        <i class="fas fa-plus"></i> جديد
+                    </button>
+                </div>
+                
+                <div class="file-explorer">
+                    <ul class="file-list" id="fileList">
+                        <!-- Files will be added dynamically -->
+                    </ul>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <div class="developer-info">
+                        <div class="avatar">م</div>
+                        <div class="info">
+                            <div class="name">محمود أحمد سعيد</div>
+                            <div class="role">مطور ويب</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <section class="editor-area">
+                <!-- Editor Tabs -->
+                <div class="editor-tabs" id="editorTabs">
+                    <!-- Tabs will be added dynamically -->
+                </div>
+                
+                <!-- Editors Container -->
+                <div class="editors-container" id="editorsContainer">
+                    <div class="editor-section html-editor active" data-lang="html">
+                        <div class="editor-header">
+                            <h3><i class="fab fa-html5"></i> HTML</h3>
+                            <div class="editor-actions">
+                                <button class="btn btn-small" data-action="format" data-lang="html">
+                                    <i class="fas fa-indent"></i> تنسيق
+                                </button>
+                                <button class="btn btn-small" data-action="clear" data-lang="html">
+                                    <i class="fas fa-eraser"></i> مسح
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-editor" id="htmlEditor"></div>
+                    </div>
+                    
+                    <div class="editor-section css-editor" data-lang="css">
+                        <div class="editor-header">
+                            <h3><i class="fab fa-css3-alt"></i> CSS</h3>
+                            <div class="editor-actions">
+                                <button class="btn btn-small" data-action="format" data-lang="css">
+                                    <i class="fas fa-indent"></i> تنسيق
+                                </button>
+                                <button class="btn btn-small" data-action="clear" data-lang="css">
+                                    <i class="fas fa-eraser"></i> مسح
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-editor" id="cssEditor"></div>
+                    </div>
+                    
+                    <div class="editor-section js-editor" data-lang="js">
+                        <div class="editor-header">
+                            <h3><i class="fab fa-js-square"></i> JavaScript</h3>
+                            <div class="editor-actions">
+                                <button class="btn btn-small" data-action="format" data-lang="js">
+                                    <i class="fas fa-indent"></i> تنسيق
+                                </button>
+                                <button class="btn btn-small" data-action="clear" data-lang="js">
+                                    <i class="fas fa-eraser"></i> مسح
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-editor" id="jsEditor"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Preview Modal (Fullscreen) -->
+        <div class="modal preview-modal" id="previewModal">
+            <div class="preview-header">
+                <div class="preview-header-left">
+                    <h3><i class="fas fa-eye"></i> معاينة الكود</h3>
+                    <div class="preview-info">
+                        <span id="previewDevice">جهاز كمبيوتر</span>
+                        <span class="preview-size" id="previewSize">--</span>
+                    </div>
+                </div>
+                <div class="preview-header-right">
+                    <div class="device-switcher">
+                        <button class="btn btn-small btn-device" data-device="desktop" title="عرض كمبيوتر">
+                            <i class="fas fa-desktop"></i>
+                        </button>
+                        <button class="btn btn-small btn-device" data-device="tablet" title="عرض تابلت">
+                            <i class="fas fa-tablet-alt"></i>
+                        </button>
+                        <button class="btn btn-small btn-device" data-device="mobile" title="عرض جوال">
+                            <i class="fas fa-mobile-alt"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-small" id="refreshPreviewBtn" title="تحديث">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                    <button class="btn btn-small" id="fullscreenPreviewBtn" title="ملء الشاشة">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="btn btn-danger btn-small" id="closePreviewBtn" title="إغلاق">
+                        <i class="fas fa-times"></i> إغلاق
+                    </button>
+                </div>
+            </div>
+            <div class="preview-content">
+                <div class="preview-frame-container">
+                    <iframe id="previewFrame" frameborder="0"></iframe>
+                </div>
+            </div>
+            <div class="preview-footer">
+                <div class="preview-stats">
+                    <span><i class="fas fa-file-code"></i> <span id="htmlSize">0</span> كيلوبايت HTML</span>
+                    <span><i class="fas fa-palette"></i> <span id="cssSize">0</span> كيلوبايت CSS</span>
+                    <span><i class="fas fa-code"></i> <span id="jsSize">0</span> كيلوبايت JS</span>
+                </div>
+                <div class="preview-url">
+                    <span id="previewUrl">معاينة محلية</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal" id="newFileModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-file-plus"></i> إنشاء ملف جديد</h3>
+                    <button class="btn btn-icon close-modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fileName">اسم الملف</label>
+                        <input type="text" id="fileName" class="form-control" placeholder="مثال: index.html">
+                    </div>
+                    <div class="form-group">
+                        <label for="fileType">نوع الملف</label>
+                        <select id="fileType" class="form-control">
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="js">JavaScript</option>
+                            <option value="txt">نص عادي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="fileContent">المحتوى الابتدائي (اختياري)</label>
+                        <textarea id="fileContent" class="form-control" rows="4" placeholder="اكتب محتوى الملف هنا..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary close-modal">إلغاء</button>
+                    <button class="btn btn-primary" id="createFileBtn">إنشاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer"></div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <div class="status">
+                        <i class="fas fa-circle" id="statusIcon"></i>
+                        <span id="statusText">جاهز</span>
+                    </div>
+                </div>
+                <div class="footer-center">
+                    <span id="currentFile">index.html</span>
+                </div>
+                <div class="footer-right">
+                    <span>مطور بواسطة <strong>محمود أحمد سعيد</strong> © 2023</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+    
+    <!-- Initialize on load -->
+    <script>
+        // Initialize the app after loading
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading progress
+            let progress = 0;
+            const progressBar = document.getElementById('progressBar');
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Hide loading screen after a short delay
+                    setTimeout(() => {
+                        document.getElementById('loadingScreen').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('loadingScreen').style.display = 'none';
+                            document.getElementById('app').style.display = 'block';
+                        }, 500);
+                    }, 300);
+                }
+                progressBar.style.width = progress + '%';
+            }, 150);
+        });
+    </script>
+</body>
+</html>
