@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // تهيئة المتغيرات
     let sites = [];
+    let currentDownloadSite = null;
     
     // إخفاء شاشة التحميل
     setTimeout(function() {
@@ -18,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // تهيئة الأحداث
     initEvents();
+    
+    // تحميل مكتبة JSZip
+    loadJSZip();
     
     // وظيفة تهيئة القائمة الجانبية
     function initSideMenu() {
@@ -131,6 +135,23 @@ document.addEventListener('DOMContentLoaded', function() {
         window.addEventListener('resize', function() {
             renderSites();
         });
+        
+        // اختصارات لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + N لإنشاء موقع جديد
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                openModal('createSiteModal');
+            }
+            
+            // Ctrl/Cmd + S لحفظ الموقع (في المحرر)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (currentDownloadSite) {
+                    prepareDownload(currentDownloadSite);
+                }
+            }
+        });
     }
     
     // وظيفة تحميل سجلات المواقع
@@ -164,14 +185,14 @@ document.addEventListener('DOMContentLoaded', function() {
         sitesGrid.innerHTML = '';
         
         // عرض المواقع بترتيب زمني (الأحدث أولاً)
-        sites.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        sites.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         
         sites.forEach((site, index) => {
             const siteCard = document.createElement('div');
             siteCard.className = 'site-card';
             siteCard.dataset.index = index;
             
-            const date = new Date(site.createdAt);
+            const date = new Date(site.updatedAt);
             const dateString = date.toLocaleDateString('ar-EG', {
                 year: 'numeric',
                 month: 'long',
@@ -180,20 +201,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 minute: '2-digit'
             });
             
+            // حساب عدد الملفات
+            const fileCount = site.files ? Object.keys(site.files).length : 0;
+            
             siteCard.innerHTML = `
                 <div class="site-icon">
                     <i class="fas fa-globe"></i>
                 </div>
                 <div class="site-name">${site.name}</div>
-                <div class="site-date">تم الإنشاء: ${dateString}</div>
+                <div class="site-date">
+                    ${dateString}
+                    <br>
+                    <small>${fileCount} ملف${fileCount !== 1 ? 'ات' : ''}</small>
+                </div>
                 <div class="site-actions">
                     <button class="btn btn-primary btn-small edit-site" data-index="${index}">
                         <i class="fas fa-edit"></i>
-                        تعديل
+                        فتح
                     </button>
                     <button class="btn btn-secondary btn-small download-site" data-index="${index}">
                         <i class="fas fa-download"></i>
                         تحميل
+                    </button>
+                    <button class="btn btn-danger btn-small delete-site" data-index="${index}">
+                        <i class="fas fa-trash"></i>
+                        حذف
                     </button>
                 </div>
             `;
@@ -215,6 +247,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
                 const index = parseInt(this.dataset.index);
                 prepareDownload(index);
+            });
+        });
+        
+        document.querySelectorAll('.delete-site').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const index = parseInt(this.dataset.index);
+                deleteSite(index);
             });
         });
         
@@ -240,6 +280,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // التحقق من عدم تكرار الاسم
+        const existingSite = sites.find(site => site.name.toLowerCase() === siteName.toLowerCase());
+        if (existingSite) {
+            if (!confirm(`يوجد موقع باسم "${siteName}" بالفعل. هل تريد فتحه؟`)) {
+                return;
+            }
+            loadEditorWithSite(existingSite);
+            closeAllModals();
+            return;
+        }
+        
         // إنشاء الموقع
         const newSite = {
             id: generateSiteId(),
@@ -247,9 +298,14 @@ document.addEventListener('DOMContentLoaded', function() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             files: {
-                html: getDefaultHTML(siteName),
-                css: getDefaultCSS(),
-                js: getDefaultJS()
+                'index.html': getDefaultHTML(siteName),
+                'style.css': getDefaultCSS(siteName),
+                'script.js': getDefaultJS(siteName)
+            },
+            fileTypes: {
+                'index.html': 'html',
+                'style.css': 'css',
+                'script.js': 'javascript'
             }
         };
         
@@ -298,19 +354,50 @@ document.addEventListener('DOMContentLoaded', function() {
     // وظيفة تحضير التحميل
     function prepareDownload(index) {
         if (sites[index]) {
-            // حفظ الفهرس الحالي للتحميل
-            localStorage.setItem('downloadSiteIndex', index);
+            currentDownloadSite = sites[index];
+            
+            // تحديث قائمة الملفات في المودال
+            const downloadFilesList = document.getElementById('downloadFilesList');
+            downloadFilesList.innerHTML = '';
+            
+            const files = currentDownloadSite.files;
+            Object.keys(files).forEach(fileName => {
+                const li = document.createElement('li');
+                const fileType = currentDownloadSite.fileTypes[fileName] || 'unknown';
+                const icon = getFileIcon(fileType);
+                
+                li.innerHTML = `
+                    <span>
+                        <i class="${icon}"></i>
+                        ${fileName}
+                    </span>
+                    <small>${fileType}</small>
+                `;
+                downloadFilesList.appendChild(li);
+            });
+            
             openModal('downloadModal');
         }
     }
     
     // وظيفة تحميل الموقع
     function downloadSite() {
-        const index = localStorage.getItem('downloadSiteIndex');
-        if (index !== null && sites[index]) {
-            const site = sites[index];
-            createZipFile(site);
+        if (currentDownloadSite) {
+            createZipFile(currentDownloadSite);
             closeAllModals();
+        }
+    }
+    
+    // وظيفة حذف الموقع
+    function deleteSite(index) {
+        if (sites[index]) {
+            const siteName = sites[index].name;
+            if (confirm(`هل تريد حذف الموقع "${siteName}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
+                sites.splice(index, 1);
+                saveSites();
+                renderSites();
+                showToast(`تم حذف الموقع "${siteName}"`, 'success');
+            }
         }
     }
     
@@ -321,15 +408,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const zip = new JSZip();
             
             // إضافة الملفات
-            zip.file("index.html", site.files.html);
-            zip.file("style.css", site.files.css);
-            zip.file("script.js", site.files.js);
+            Object.keys(site.files).forEach(fileName => {
+                zip.file(fileName, site.files[fileName]);
+            });
             
             // إضافة ملف معلومات
             const info = {
                 siteName: site.name,
                 created: site.createdAt,
                 modified: site.updatedAt,
+                files: Object.keys(site.files),
                 developer: "محمود أحمد سعيد"
             };
             zip.file("site-info.json", JSON.stringify(info, null, 2));
@@ -339,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(function(content) {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(content);
-                    link.download = `${site.name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.zip`;
+                    link.download = `${site.name.replace(/[^a-z0-9\u0600-\u06FF]/gi, '_')}_${Date.now()}.zip`;
                     link.click();
                     
                     // تنظيف
@@ -352,19 +440,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     showToast('حدث خطأ في التحميل', 'error');
                 });
         } else {
-            // البديل إذا لم تكن مكتبة JSZip موجودة
-            showToast('ميزة التحميل تحتاج إلى مكتبة JSZip', 'warning');
-            
-            // تحميل ملف HTML فقط كبديل
-            const htmlContent = site.files.html;
-            const blob = new Blob([htmlContent], {type: 'text/html'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${site.name.replace(/[^a-z0-9]/gi, '_')}.html`;
-            link.click();
-            
-            setTimeout(() => URL.revokeObjectURL(link.href), 100);
-            showToast('تم تحميل ملف HTML', 'info');
+            showToast('جاري تحميل مكتبة الضغط...', 'warning');
+            loadJSZip(() => {
+                if (typeof JSZip !== 'undefined') {
+                    createZipFile(site);
+                } else {
+                    showToast('تعذر تحميل مكتبة الضغط', 'error');
+                }
+            });
         }
     }
     
@@ -388,7 +471,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // التركيز على حقل الإدخال إذا كان موجود
             const input = modal.querySelector('input');
             if (input) {
-                setTimeout(() => input.focus(), 100);
+                setTimeout(() => {
+                    input.focus();
+                    input.select();
+                }, 100);
             }
         }
     }
@@ -398,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.classList.remove('active');
         });
+        currentDownloadSite = null;
     }
     
     // وظيفة التمرير للقسم
@@ -410,25 +497,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // وظيفة عرض الرسائل
     function showToast(message, type = 'info') {
+        // إزالة أي رسالة سابقة
+        const existingToast = document.querySelector('.toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
         // إنشاء عنصر الرسالة
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: ${type === 'error' ? '#dc2626' : 
-                        type === 'success' ? '#10b981' : 
-                        type === 'warning' ? '#f59e0b' : '#4a6ee0'};
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            z-index: 4000;
-            font-family: 'Cairo', sans-serif;
-            text-align: center;
-            animation: toastSlideIn 0.3s ease;
-        `;
         
         const icon = type === 'success' ? 'fas fa-check-circle' :
                     type === 'error' ? 'fas fa-exclamation-circle' :
@@ -436,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     'fas fa-info-circle';
         
         toast.innerHTML = `
-            <i class="${icon}" style="margin-left: 10px;"></i>
+            <i class="${icon}"></i>
             ${message}
         `;
         
@@ -444,18 +521,49 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // إزالة الرسالة بعد 3 ثواني
         setTimeout(() => {
-            toast.style.animation = 'toastSlideIn 0.3s ease reverse forwards';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
+            if (toast.parentNode) {
+                toast.style.animation = 'toastSlideIn 0.3s ease reverse forwards';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }
         }, 3000);
     }
     
     // توليد معرف فريد للموقع
     function generateSiteId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+    
+    // الحصول على أيقونة الملف حسب النوع
+    function getFileIcon(fileType) {
+        const icons = {
+            'html': 'fab fa-html5',
+            'css': 'fab fa-css3-alt',
+            'javascript': 'fab fa-js-square',
+            'js': 'fab fa-js-square',
+            'python': 'fab fa-python',
+            'php': 'fab fa-php',
+            'java': 'fab fa-java',
+            'c': 'fas fa-file-code',
+            'cpp': 'fas fa-file-code',
+            'csharp': 'fas fa-file-code',
+            'ruby': 'far fa-gem',
+            'swift': 'fas fa-mobile-alt',
+            'go': 'fas fa-code',
+            'rust': 'fas fa-cog',
+            'typescript': 'fas fa-code',
+            'json': 'fas fa-code',
+            'xml': 'fas fa-code',
+            'sql': 'fas fa-database',
+            'markdown': 'fas fa-file-alt',
+            'text': 'fas fa-file-alt',
+            'unknown': 'fas fa-file'
+        };
+        
+        return icons[fileType.toLowerCase()] || icons.unknown;
     }
     
     // المحتوى الافتراضي للملفات
@@ -469,57 +577,148 @@ document.addEventListener('DOMContentLoaded', function() {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* أنماط إضافية */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .content {
+            background: white;
+            color: #333;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎉 ${siteName}</h1>
             <p>مرحباً بك في موقعك الجديد!</p>
+            <p><small>تم الإنشاء باستخدام محرر الأكواد المتطور</small></p>
         </header>
         
-        <main>
-            <div class="content">
-                <h2>محتوى الموقع</h2>
-                <p>هذا موقعك الذي أنشأته باستخدام محرر الأكواد المتطور. يمكنك تعديل هذا المحتوى كما تريد.</p>
-                
-                <div class="features">
-                    <div class="feature">
-                        <i class="fas fa-rocket"></i>
-                        <h3>سريع</h3>
-                        <p>موقع سريع الاستجابة</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>متجاوب</h3>
-                        <p>يعمل على جميع الأجهزة</p>
-                    </div>
-                    <div class="feature">
-                        <i class="fas fa-paint-brush"></i>
-                        <h3>جميل</h3>
-                        <p>تصميم حديث وجذاب</p>
-                    </div>
+        <main class="content">
+            <h2>محتوى الموقع</h2>
+            <p>هذا موقعك الذي أنشأته باستخدام محرر الأكواد المتطور. يمكنك تعديل هذا المحتوى كما تريد.</p>
+            
+            <div class="features" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin: 3rem 0;">
+                <div class="feature" style="text-align: center; padding: 2rem; background: #f8fafc; border-radius: 10px;">
+                    <i class="fas fa-rocket" style="font-size: 3rem; color: #4a6ee0; margin-bottom: 1rem;"></i>
+                    <h3>سريع</h3>
+                    <p>موقع سريع الاستجابة</p>
                 </div>
+                <div class="feature" style="text-align: center; padding: 2rem; background: #f8fafc; border-radius: 10px;">
+                    <i class="fas fa-mobile-alt" style="font-size: 3rem; color: #4a6ee0; margin-bottom: 1rem;"></i>
+                    <h3>متجاوب</h3>
+                    <p>يعمل على جميع الأجهزة</p>
+                </div>
+                <div class="feature" style="text-align: center; padding: 2rem; background: #f8fafc; border-radius: 10px;">
+                    <i class="fas fa-paint-brush" style="font-size: 3rem; color: #4a6ee0; margin-bottom: 1rem;"></i>
+                    <h3>جميل</h3>
+                    <p>تصميم حديث وجذاب</p>
+                </div>
+            </div>
+            
+            <button id="demoBtn" style="display: block; margin: 2rem auto; padding: 1rem 3rem; background: linear-gradient(45deg, #4a6ee0, #6a4ee0); color: white; border: none; border-radius: 50px; font-size: 1.1rem; cursor: pointer;">
+                <i class="fas fa-magic"></i>
+                جرب التفاعل
+            </button>
+            
+            <div id="demoText" style="text-align: center; padding: 2rem; font-size: 1.2rem; color: #64748b;">
+                👆 اضغط على الزر أعلاه
             </div>
         </main>
         
         <footer>
-            <p>تم التطوير باستخدام محرر الأكواد المتطور - مطور بواسطة محمود أحمد سعيد</p>
+            <p>تم التطوير باستخدام محرر الأكواد المتطور</p>
+            <p>مطور بواسطة: محمود أحمد سعيد</p>
         </footer>
     </div>
     
-    <script src="script.js"></script>
+    <script>
+        // كود JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const demoBtn = document.getElementById('demoBtn');
+            const demoText = document.getElementById('demoText');
+            
+            if (demoBtn) {
+                demoBtn.addEventListener('click', function() {
+                    demoText.innerHTML = '🎊 <strong>ممتاز!</strong> أنت تستخدم JavaScript!';
+                    demoText.style.color = '#4a6ee0';
+                    demoText.style.fontSize = '1.5rem';
+                    
+                    this.innerHTML = '<i class="fas fa-check"></i> تم التنفيذ!';
+                    this.style.background = 'linear-gradient(45deg, #10b981, #34d399)';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-magic"></i> جرب مرة أخرى';
+                        this.style.background = 'linear-gradient(45deg, #4a6ee0, #6a4ee0)';
+                        demoText.innerHTML = '👆 اضغط على الزر أعلاه';
+                        demoText.style.color = '#64748b';
+                        demoText.style.fontSize = '1.2rem';
+                    }, 2000);
+                });
+            }
+            
+            console.log('🚀 موقع ${siteName} يعمل بنجاح!');
+        });
+    </script>
 </body>
 </html>`;
     }
     
-    function getDefaultCSS() {
+    function getDefaultCSS(siteName) {
         return `/* أنماط موقع ${siteName} */
+
+/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* أنماط عامة */
 body {
     font-family: 'Cairo', sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -534,6 +733,7 @@ body {
     padding: 20px;
 }
 
+/* Header */
 header {
     text-align: center;
     padding: 3rem 2rem;
@@ -554,6 +754,7 @@ header h1 {
     50% { transform: translateY(-10px); }
 }
 
+/* Content */
 .content {
     background: white;
     color: #333;
@@ -562,6 +763,7 @@ header h1 {
     margin-bottom: 2rem;
 }
 
+/* Features */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -575,10 +777,12 @@ header h1 {
     background: #f8fafc;
     border-radius: 10px;
     transition: transform 0.3s ease;
+    cursor: pointer;
 }
 
 .feature:hover {
     transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .feature i {
@@ -587,6 +791,37 @@ header h1 {
     margin-bottom: 1rem;
 }
 
+.feature h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.feature p {
+    color: #64748b;
+}
+
+/* Button */
+button {
+    display: block;
+    margin: 2rem auto;
+    padding: 1rem 3rem;
+    background: linear-gradient(45deg, #4a6ee0, #6a4ee0);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(74, 110, 224, 0.3);
+}
+
+/* Footer */
 footer {
     text-align: center;
     padding: 2rem;
@@ -595,6 +830,7 @@ footer {
     backdrop-filter: blur(10px);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
@@ -607,34 +843,75 @@ footer {
     .feature {
         padding: 1.5rem;
     }
+    
+    button {
+        width: 90%;
+        padding: 0.8rem;
+    }
 }`;
     }
     
-    function getDefaultJS() {
+    function getDefaultJS(siteName) {
         return `// JavaScript لموقع ${siteName}
-console.log('مرحباً بك في موقعك الجديد!');
+
+console.log('🚀 موقع ${siteName} يعمل بنجاح!');
+console.log('💻 تم التطوير باستخدام محرر الأكواد المتطور');
 
 // تهيئة الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('تم تحميل الصفحة بنجاح');
+    console.log('📄 تم تحميل الصفحة بنجاح');
     
-    // إضافة تأثيرات للعناصر
+    // الحصول على العناصر
+    const demoBtn = document.getElementById('demoBtn');
+    const demoText = document.getElementById('demoText');
     const features = document.querySelectorAll('.feature');
     
-    features.forEach(feature => {
-        feature.addEventListener('click', function() {
-            this.style.transform = 'scale(1.05)';
-            this.style.background = '#e0e7ff';
+    // تفاعل مع زر التجربة
+    if (demoBtn && demoText) {
+        demoBtn.addEventListener('click', function() {
+            demoText.textContent = '🎊 ممتاز! أنت تستخدم JavaScript!';
+            demoText.style.color = '#4a6ee0';
+            demoText.style.fontSize = '1.5rem';
+            demoText.style.fontWeight = 'bold';
+            
+            this.style.background = 'linear-gradient(45deg, #10b981, #34d399)';
+            this.innerHTML = '<i class="fas fa-check"></i> تم التنفيذ!';
             
             setTimeout(() => {
-                this.style.transform = 'scale(1)';
-                this.style.background = '';
-            }, 300);
+                this.style.background = 'linear-gradient(45deg, #4a6ee0, #6a4ee0)';
+                this.innerHTML = '<i class="fas fa-magic"></i> جرب مرة أخرى';
+                demoText.textContent = '👆 اضغط على الزر أعلاه';
+                demoText.style.color = '#64748b';
+                demoText.style.fontSize = '1.2rem';
+                demoText.style.fontWeight = 'normal';
+            }, 2000);
         });
-    });
+    }
     
-    // تحديث التاريخ في الفوتر
-    const footer = document.querySelector('footer p');
+    // تفاعل مع بطاقات الميزات
+    if (features.length > 0) {
+        features.forEach((feature, index) => {
+            feature.addEventListener('click', function() {
+                const colors = ['#4a6ee0', '#6a4ee0', '#10b981'];
+                const h3 = this.querySelector('h3');
+                const icon = this.querySelector('i');
+                
+                const originalText = h3.textContent;
+                const originalColor = h3.style.color;
+                
+                h3.textContent = 'مميز!';
+                h3.style.color = colors[index] || '#4a6ee0';
+                
+                setTimeout(() => {
+                    h3.textContent = originalText;
+                    h3.style.color = originalColor;
+                }, 1000);
+            });
+        });
+    }
+    
+    // تحديث تاريخ الفوتر
+    const footer = document.querySelector('footer');
     if (footer) {
         const date = new Date();
         const dateStr = date.toLocaleDateString('ar-EG', {
@@ -642,23 +919,29 @@ document.addEventListener('DOMContentLoaded', function() {
             month: 'long',
             day: 'numeric'
         });
-        footer.innerHTML += '<br><small>تاريخ الإنشاء: ' + dateStr + '</small>';
+        
+       
+        footer.appendChild(dateElement);
     }
 });
 
-// دالة مساعدة لإضافة رسائل
+// دالة مساعدة لعرض الرسائل
 function showMessage(message, type = 'info') {
     const messageDiv = document.createElement('div');
     messageDiv.style.cssText = \`
         position: fixed;
         top: 20px;
         right: 20px;
-        background: \${type === 'success' ? '#10b981' : '#4a6ee0'};
+        background: \${type === 'success' ? '#10b981' : 
+                    type === 'error' ? '#ef4444' : 
+                    type === 'warning' ? '#f59e0b' : '#4a6ee0'};
         color: white;
-        padding: 15px 20px;
+        padding: 15px 25px;
         border-radius: 10px;
         z-index: 1000;
+        font-family: 'Cairo', sans-serif;
         animation: fadeIn 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     \`;
     
     messageDiv.textContent = message;
@@ -667,338 +950,34 @@ function showMessage(message, type = 'info') {
     setTimeout(() => {
         messageDiv.remove();
     }, 3000);
+}
+
+// دالة مساعدة لإضافة تأثيرات
+function addEffect(element, effect = 'bounce') {
+    element.style.animation = \`\${effect} 0.5s ease\`;
+    
+    setTimeout(() => {
+        element.style.animation = '';
+    }, 500);
 }`;
     }
     
-    // تحميل مكتبة JSZip عند الحاجة
-    function loadJSZip() {
+    // تحميل مكتبة JSZip
+    function loadJSZip(callback) {
         if (typeof JSZip === 'undefined') {
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
             script.onload = function() {
                 console.log('تم تحميل مكتبة JSZip');
+                if (callback) callback();
+            };
+            script.onerror = function() {
+                console.error('فشل في تحميل مكتبة JSZip');
+                if (callback) callback();
             };
             document.head.appendChild(script);
+        } else if (callback) {
+            callback();
         }
     }
-    
-    // تحميل مكتبة JSZip عند بدء الصفحة
-    loadJSZip();
 });
-
-// الوظائف المشتركة بين جميع الصفحات
-
-// تهيئة الصفحة الأساسية
-document.addEventListener('DOMContentLoaded', function() {
-    // تحسينات للهواتف المحمولة
-    if ('ontouchstart' in window) {
-        handleTouchEvents();
-    }
-    
-    // تحسينات للأجهزة المختلفة
-    detectDevice();
-    
-    // إعادة التحقق عند تغيير حجم الشاشة
-    window.addEventListener('resize', detectDevice);
-    
-    // رسالة ترحيب في الكونسول
-    console.log('%c🚀 محرر الأكواد المتطور', 'font-size: 24px; color: #4a6ee0; font-weight: bold;');
-    console.log('%cمرحباً بك! استمتع بتجربة التطوير.', 'font-size: 16px; color: #a5b4fc;');
-});
-
-// معالجة أحداث اللمس للهواتف
-function handleTouchEvents() {
-    // منع التكبير عند النقر المزدوج
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
-        const now = new Date().getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-    
-    // تحسينات للأزرار على الهواتف
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.95)';
-        });
-        
-        button.addEventListener('touchend', function() {
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-        });
-    });
-}
-
-// كشف نوع الجهاز
-function detectDevice() {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        document.body.classList.add('mobile-device');
-    }
-    
-    if (isTablet) {
-        document.body.classList.add('tablet-device');
-    }
-    
-    // تحسينات للشاشات الصغيرة
-    if (window.innerWidth < 768) {
-        document.body.classList.add('small-screen');
-    } else {
-        document.body.classList.remove('small-screen');
-    }
-}
-
-// تحميل أي بيانات محفوظة سابقاً
-function loadSavedData() {
-    try {
-        const lastVisit = localStorage.getItem('lastVisit');
-        if (lastVisit) {
-            const visitDate = new Date(lastVisit);
-            const now = new Date();
-            const diffDays = Math.floor((now - visitDate) / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 0) {
-                console.log('مرحباً بعودتك! لقد زرتَ اليوم.');
-            } else if (diffDays === 1) {
-                console.log('مرحباً بعودتك! لقد زرتَ بالأمس.');
-            } else {
-                console.log(`مرحباً بعودتك! آخر زيارة كانت منذ ${diffDays} أيام.`);
-            }
-        }
-    } catch (e) {
-        console.log('لا يمكن قراءة البيانات المحفوظة');
-    }
-}
-
-// حفظ بيانات الزيارة
-function saveVisitData() {
-    try {
-        localStorage.setItem('lastVisit', new Date().toISOString());
-    } catch (e) {
-        console.log('لا يمكن حفظ البيانات');
-    }
-}
-
-// دعم لوحة المفاتيح (اختصارات عامة)
-function initKeyboardShortcuts() {
-    document.addEventListener('keydown', function(event) {
-        // زر Escape لإغلاق النوافذ
-        if (event.key === 'Escape') {
-            const modals = document.querySelectorAll('.modal-overlay');
-            modals.forEach(modal => {
-                modal.classList.remove('active');
-            });
-            
-            const sideMenu = document.getElementById('sideMenu');
-            if (sideMenu && sideMenu.classList.contains('open')) {
-                sideMenu.classList.remove('open');
-            }
-        }
-    });
-}
-
-// تهيئة اختصارات لوحة المفاتيح
-initKeyboardShortcuts();
-
-// تحميل بيانات الزيارة
-loadSavedData();
-
-// حفظ بيانات الزيارة عند الخروج
-window.addEventListener('beforeunload', function() {
-    saveVisitData();
-});
-
-// تأثيرات CSS إضافية للرسائل
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes toastSlideIn {
-        from {
-            opacity: 0;
-            transform: translate(-50%, 20px);
-        }
-        to {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// الوظائف المشتركة بين جميع الصفحات
-
-// تهيئة الصفحة الأساسية
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('محرر الأكواد المتطور - تهيئة الصفحة');
-    
-    // تحسينات للهواتف المحمولة
-    if ('ontouchstart' in window) {
-        handleTouchEvents();
-    }
-    
-    // تحسينات للأجهزة المختلفة
-    detectDevice();
-    
-    // إعادة التحقق عند تغيير حجم الشاشة
-    window.addEventListener('resize', detectDevice);
-    
-    // تهيئة اختصارات لوحة المفاتيح
-    initKeyboardShortcuts();
-    
-    // تحميل بيانات الزيارة
-    loadSavedData();
-    
-    // رسالة ترحيب في الكونسول
-    console.log('%c🚀 محرر الأكواد المتطور', 'font-size: 24px; color: #4a6ee0; font-weight: bold;');
-    console.log('%cمرحباً بك! استمتع بتجربة التطوير.', 'font-size: 16px; color: #a5b4fc;');
-});
-
-// معالجة أحداث اللمس للهواتف
-function handleTouchEvents() {
-    // منع التكبير عند النقر المزدوج
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
-        const now = new Date().getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-    
-    // تحسينات للأزرار على الهواتف
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.95)';
-        });
-        
-        button.addEventListener('touchend', function() {
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 150);
-        });
-    });
-}
-
-// كشف نوع الجهاز
-function detectDevice() {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-        document.body.classList.add('mobile-device');
-    }
-    
-    if (isTablet) {
-        document.body.classList.add('tablet-device');
-    }
-    
-    // تحسينات للشاشات الصغيرة
-    if (window.innerWidth < 768) {
-        document.body.classList.add('small-screen');
-    } else {
-        document.body.classList.remove('small-screen');
-    }
-}
-
-// تحميل أي بيانات محفوظة سابقاً
-function loadSavedData() {
-    try {
-        const lastVisit = localStorage.getItem('lastVisit');
-        if (lastVisit) {
-            const visitDate = new Date(lastVisit);
-            const now = new Date();
-            const diffDays = Math.floor((now - visitDate) / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 0) {
-                console.log('مرحباً بعودتك! لقد زرتَ اليوم.');
-            } else if (diffDays === 1) {
-                console.log('مرحباً بعودتك! لقد زرتَ بالأمس.');
-            } else {
-                console.log(`مرحباً بعودتك! آخر زيارة كانت منذ ${diffDays} أيام.`);
-            }
-        }
-    } catch (e) {
-        console.log('لا يمكن قراءة البيانات المحفوظة');
-    }
-}
-
-// حفظ بيانات الزيارة
-function saveVisitData() {
-    try {
-        localStorage.setItem('lastVisit', new Date().toISOString());
-    } catch (e) {
-        console.log('لا يمكن حفظ البيانات');
-    }
-}
-
-// دعم لوحة المفاتيح (اختصارات عامة)
-function initKeyboardShortcuts() {
-    document.addEventListener('keydown', function(event) {
-        // زر Escape لإغلاق النوافذ
-        if (event.key === 'Escape') {
-            const modals = document.querySelectorAll('.modal-overlay');
-            modals.forEach(modal => {
-                modal.classList.remove('active');
-            });
-            
-            const sideMenu = document.getElementById('sideMenu');
-            if (sideMenu && sideMenu.classList.contains('open')) {
-                sideMenu.classList.remove('open');
-            }
-        }
-    });
-}
-
-// حفظ بيانات الزيارة عند الخروج
-window.addEventListener('beforeunload', function() {
-    saveVisitData();
-});
-
-// تأثيرات CSS إضافية للرسائل
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes toastSlideIn {
-        from {
-            opacity: 0;
-            transform: translate(-50%, 20px);
-        }
-        to {
-            opacity: 1;
-            transform: translate(-50%, 0);
-        }
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-20px); }
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    
-    @keyframes modalSlideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);

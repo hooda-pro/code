@@ -2,10 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>محرر الأكواد المتطور - مطور محمود أحمد سعيد</title>
-    <meta name="description" content="محرر أكواد متطور يدعم HTML، CSS، JavaScript مع معاينة مباشرة">
-    <meta name="author" content="محمود أحمد سعيد">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الأكواد المتطور - ابدأ الآن</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -13,323 +11,289 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <!-- CSS الرئيسي -->
+    <link rel="stylesheet" href="css/style.css">
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
-    
-    <style>
-        /* Loading screen styles */
-        #loadingScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0c0e2a 0%, #1a1b3a 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        
-        .loading-content {
-            text-align: center;
-            color: white;
-            padding: 20px;
-        }
-        
-        .loading-logo {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: pulse 2s infinite;
-        }
-        
-        .loading-text {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .loading-progress {
-            width: 100%;
-            max-width: 300px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 0 auto;
-        }
-        
-        .loading-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4a6ee0, #6a4ee0);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 5px;
-        }
-        
-        .developer-signature {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            padding: 0 20px;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        @media (max-width: 768px) {
-            .loading-logo { font-size: 3rem; }
-            .loading-text { font-size: 1.2rem; }
-        }
-        
-        @media (max-width: 480px) {
-            .loading-logo { font-size: 2.5rem; }
-            .loading-text { font-size: 1rem; }
-            .developer-signature { font-size: 0.8rem; }
-        }
-    </style>
+    <!-- CSS للصفحة الرئيسية -->
+    <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-logo">💻</div>
-            <h1 class="loading-text">محرر الأكواد المتطور</h1>
-            <div class="loading-progress">
-                <div class="loading-progress-bar" id="progressBar"></div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">جاري التحميل...</div>
+    </div>
+    
+    <!-- القائمة الجانبية -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h3><i class="fas fa-bars"></i> القائمة</h3>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="menu-items">
+            <button class="menu-item active" id="homeMenuItem">
+                <i class="fas fa-home"></i>
+                الرئيسية
+            </button>
+            <button class="menu-item" id="sitesMenuItem">
+                <i class="fas fa-sitemap"></i>
+                سجلات المواقع
+            </button>
+            <button class="menu-item" id="whoAmIMenuItem">
+                <i class="fas fa-user"></i>
+                من أنا؟
+            </button>
+            <button class="menu-item" id="publishMenuItem">
+                <i class="fas fa-share"></i>
+                كيف تنشر موقعك
+            </button>
+            <button class="menu-item" id="newSiteMenuItem">
+                <i class="fas fa-plus-circle"></i>
+                إنشاء موقع جديد
+            </button>
+        </div>
+        <div class="menu-footer">
+            <p>مطور بواسطة: <span class="developer-name">محمود أحمد سعيد</span></p>
+        </div>
+    </div>
+    
+    <!-- زر فتح القائمة -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Main Content -->
+    <div class="main-container">
+        <header class="app-header">
+            <div class="logo">💻</div>
+            <h1 class="title">محرر الأكواد المتطور</h1>
+            <p class="subtitle">
+                أنشئ مواقع ويب كاملة باستخدام أي لغة برمجة<br>
+                في بيئة متكاملة سهلة الاستخدام مع معاينة في صفحة منفصلة
+            </p>
+        </header>
+        
+        <!-- قسم سجلات المواقع -->
+        <section class="sites-section" id="sitesSection">
+            <h2 class="section-title">
+                <i class="fas fa-folder-open"></i>
+                سجلات المواقع
+            </h2>
+            <div class="sites-grid" id="sitesGrid">
+                <!-- المواقع ستظهر هنا ديناميكياً -->
             </div>
-            <div class="developer-signature">
-                مطور بواسطة: محمود أحمد سعيد
+            <div class="empty-sites" id="emptySites">
+                <i class="fas fa-folder-open"></i>
+                <p>لا توجد مواقع محفوظة بعد</p>
+                <button class="btn btn-primary" id="createFirstSiteBtn">
+                    <i class="fas fa-plus-circle"></i>
+                    إنشاء أول موقع
+                </button>
+            </div>
+        </section>
+        
+        <!-- قسم الميزات -->
+        <section class="features">
+            <div class="feature-card">
+                <i class="fas fa-code feature-icon"></i>
+                <h3 class="feature-title">محرر متعدد اللغات</h3>
+                <p class="feature-description">
+                    دعم جميع لغات البرمجة مع تلوين الصيغة المناسب لكل لغة
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-eye feature-icon"></i>
+                <h3 class="feature-title">معاينة منفصلة</h3>
+                <p class="feature-description">
+                    معاينة في صفحة منفصلة مع تحديث فوري للتغيرات
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <i class="fas fa-file-archive feature-icon"></i>
+                <h3 class="feature-title">تحميل كامل</h3>
+                <p class="feature-description">
+                    تحميل جميع ملفات المشروع في ملف ZIP واحد
+                </p>
+            </div>
+        </section>
+    </div>
+    
+    <!-- زر ابدأ الآن الثابت -->
+    <button class="start-fixed-button" id="startFixedBtn">
+        <i class="fas fa-rocket"></i>
+        ابدأ الآن
+    </button>
+    
+    <!-- Modals -->
+    
+    <!-- Modal إنشاء موقع جديد -->
+    <div class="modal-overlay" id="createSiteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-plus-circle"></i>
+                    إنشاء موقع جديد
+                </h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createSiteForm">
+                    <div class="form-group">
+                        <label for="siteName">اسم الموقع</label>
+                        <input type="text" id="siteName" class="form-control" 
+                               placeholder="أدخل اسم موقعك" required
+                               pattern=".*\S+.*" title="يرجى إدخال اسم الموقع">
+                        <small class="form-text">يمكنك استخدام أي لغة (العربية، الإنجليزية، الفرنسية، الألمانية، الصينية، الخ)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">إلغاء</button>
+                <button class="btn btn-primary" id="submitCreateSite">
+                    <i class="fas fa-plus-circle"></i>
+                    إنشاء
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- Main App -->
-    <div id="app" style="display: none;">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-left">
-                <button class="menu-toggle" id="menuToggle" aria-label="فتح/إغلاق القائمة">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="logo">
-                    <i class="fas fa-code"></i>
-                    <h1>محرر الأكواد</h1>
-                </div>
-            </div>
-            
-            <div class="header-center">
-                <div class="project-name">
-                    <i class="fas fa-folder"></i>
-                    <span id="projectName">مشروع جديد</span>
-                </div>
-            </div>
-            
-            <div class="header-right">
-                <button class="btn btn-icon" title="تشغيل الكود" id="runBtn" aria-label="تشغيل الكود">
-                    <i class="fas fa-play"></i>
-                </button>
-                <button class="btn btn-icon" title="حفظ الكل" id="saveBtn" aria-label="حفظ الكل">
-                    <i class="fas fa-save"></i>
-                </button>
-                <button class="btn btn-icon" title="تحميل المشروع" id="downloadBtn" aria-label="تحميل المشروع">
+    
+    <!-- Modal تحميل الموقع -->
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
                     <i class="fas fa-download"></i>
+                    تحميل الموقع
+                </h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
                 </button>
-                <div class="theme-toggle">
-                    <button class="btn btn-icon" title="تبديل السمة" id="themeToggle" aria-label="تبديل السمة">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="app-main">
-            <!-- Sidebar -->
-            <aside class="sidebar" id="sidebar">
-                <div class="sidebar-header">
-                    <h3><i class="fas fa-folder-open"></i> الملفات</h3>
-                    <button class="btn btn-small" id="newFileBtn">
-                        <i class="fas fa-plus"></i> جديد
-                    </button>
-                </div>
-                
-                <div class="file-explorer">
-                    <ul class="file-list" id="fileList">
-                        <!-- Files will be added dynamically -->
+            <div class="modal-body">
+                <div class="download-info">
+                    <div class="download-icon">
+                        <i class="fas fa-file-archive"></i>
+                    </div>
+                    <h3 class="download-title">سيتم تحميل جميع ملفات الموقع</h3>
+                    <p class="download-description">
+                        سيتم إنشاء ملف ZIP يحتوي على جميع ملفات الموقع:
+                    </p>
+                    <ul class="download-list" id="downloadFilesList">
+                        <!-- سيتم ملؤه ديناميكياً -->
                     </ul>
                 </div>
-                
-                <div class="sidebar-footer">
-                    <div class="developer-info">
-                        <div class="avatar">م</div>
-                        <div class="info">
-                            <div class="name">محمود أحمد سعيد</div>
-                            <div class="role">مطور ويب</div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Editor Area -->
-            <section class="editor-area">
-                <!-- Editor Tabs -->
-                <div class="editor-tabs" id="editorTabs">
-                    <!-- Tabs will be added dynamically -->
-                </div>
-                
-                <!-- Editors Container -->
-                <div class="editors-container" id="editorsContainer">
-                    <div class="editor-section html-editor active" data-lang="html">
-                        <div class="editor-header">
-                            <h3><i class="fab fa-html5"></i> HTML</h3>
-                            <div class="editor-actions">
-                                <button class="btn btn-small" data-action="format" data-lang="html" aria-label="تنسيق HTML">
-                                    <i class="fas fa-indent"></i> تنسيق
-                                </button>
-                                <button class="btn btn-small" data-action="clear" data-lang="html" aria-label="مسح HTML">
-                                    <i class="fas fa-eraser"></i> مسح
-                                </button>
-                            </div>
-                        </div>
-                        <div class="code-editor" id="htmlEditor"></div>
-                    </div>
-                    
-                    <div class="editor-section css-editor" data-lang="css">
-                        <div class="editor-header">
-                            <h3><i class="fab fa-css3-alt"></i> CSS</h3>
-                            <div class="editor-actions">
-                                <button class="btn btn-small" data-action="format" data-lang="css" aria-label="تنسيق CSS">
-                                    <i class="fas fa-indent"></i> تنسيق
-                                </button>
-                                <button class="btn btn-small" data-action="clear" data-lang="css" aria-label="مسح CSS">
-                                    <i class="fas fa-eraser"></i> مسح
-                                </button>
-                            </div>
-                        </div>
-                        <div class="code-editor" id="cssEditor"></div>
-                    </div>
-                    
-                    <div class="editor-section js-editor" data-lang="js">
-                        <div class="editor-header">
-                            <h3><i class="fab fa-js-square"></i> JavaScript</h3>
-                            <div class="editor-actions">
-                                <button class="btn btn-small" data-action="format" data-lang="js" aria-label="تنسيق JavaScript">
-                                    <i class="fas fa-indent"></i> تنسيق
-                                </button>
-                                <button class="btn btn-small" data-action="clear" data-lang="js" aria-label="مسح JavaScript">
-                                    <i class="fas fa-eraser"></i> مسح
-                                </button>
-                            </div>
-                        </div>
-                        <div class="code-editor" id="jsEditor"></div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Modals -->
-        <div class="modal" id="newFileModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-file-plus"></i> إنشاء ملف جديد</h3>
-                    <button class="btn btn-icon close-modal" aria-label="إغلاق">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="fileName">اسم الملف</label>
-                        <input type="text" id="fileName" class="form-control" placeholder="مثال: index.html" value="newfile.html">
-                    </div>
-                    <div class="form-group">
-                        <label for="fileType">نوع الملف</label>
-                        <select id="fileType" class="form-control">
-                            <option value="html">HTML</option>
-                            <option value="css">CSS</option>
-                            <option value="js">JavaScript</option>
-                            <option value="txt">نص عادي</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="fileContent">المحتوى الابتدائي (اختياري)</label>
-                        <textarea id="fileContent" class="form-control" rows="4" placeholder="اكتب محتوى الملف هنا..."></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary close-modal">إلغاء</button>
-                    <button class="btn btn-primary" id="createFileBtn">إنشاء</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">إلغاء</button>
+                <button class="btn btn-primary" id="confirmDownload">
+                    <i class="fas fa-download"></i>
+                    تحميل الآن
+                </button>
             </div>
         </div>
-
-        <!-- Toast Notifications -->
-        <div id="toastContainer"></div>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-            <div class="footer-content">
-                <div class="footer-left">
-                    <div class="status">
-                        <i class="fas fa-circle" id="statusIcon"></i>
-                        <span id="statusText">جاهز</span>
+    </div>
+    
+    <!-- Modal "من أنا" -->
+    <div class="modal-overlay" id="whoAmIModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-user"></i>
+                    من أنا؟
+                </h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="developer-profile">
+                    <div class="developer-avatar">م</div>
+                    <h3 class="developer-name-large">محمود أحمد سعيد</h3>
+                    <p class="developer-role">مطور ويب متخصص</p>
+                    <p class="developer-bio">
+                        مطور ويب بخبرة 5 سنوات في تطوير تطبيقات الويب الحديثة.
+                        متخصص في جميع لغات البرمجة والتطوير بأحدث التقنيات.
+                    </p>
+                    <div class="skills">
+                        <span class="skill-tag">HTML/CSS/JS</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">PHP</span>
+                        <span class="skill-tag">Java</span>
+                        <span class="skill-tag">C++</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Vue.js</span>
+                        <span class="skill-tag">Node.js</span>
                     </div>
                 </div>
-                <div class="footer-center">
-                    <span id="currentFile">index.html</span>
-                </div>
-                <div class="footer-right">
-                    <span>مطور بواسطة <strong>محمود أحمد سعيد</strong></span>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal">
+                    <i class="fas fa-check"></i>
+                    موافق
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal "كيف تنشر موقعك" -->
+    <div class="modal-overlay" id="publishModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-share"></i>
+                    كيف تنشر موقعك
+                </h2>
+                <button class="close-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="publish-info">
+                    <div class="publish-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 class="publish-title">قم بالتواصل مع المطور لنشر موقعك</h3>
+                    <p class="publish-description">
+                        لنشر موقعك على الإنترنت وجعله متاحاً للجميع، يرجى التواصل مع المطور عبر إحدى وسائل التواصل التالية:
+                    </p>
+                    
+                    <div class="contact-list">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <span>dev.mahmoud@example.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone contact-icon"></i>
+                            <span>+20 123 456 7890</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fab fa-whatsapp contact-icon"></i>
+                            <span>+20 123 456 7890</span>
+                        </div>
+                    </div>
+                    
+                    <p class="publish-description">
+                        سيتم الرد عليك خلال 24 ساعة لمناقشة تفاصيل مشروعك وتقديم أفضل حل للنشر.
+                    </p>
                 </div>
             </div>
-        </footer>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal">
+                    <i class="fas fa-check"></i>
+                    موافق
+                </button>
+            </div>
+        </div>
     </div>
-
-    <!-- Custom JavaScript -->
-    <script src="script.js"></script>
     
-    <!-- Initialize on load -->
-    <script>
-        // Initialize the app after loading
-        document.addEventListener('DOMContentLoaded', function() {
-            // Simulate loading progress
-            let progress = 0;
-            const progressBar = document.getElementById('progressBar');
-            const interval = setInterval(() => {
-                progress += Math.random() * 15 + 5;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    
-                    // Hide loading screen after a short delay
-                    setTimeout(() => {
-                        document.getElementById('loadingScreen').style.opacity = '0';
-                        setTimeout(() => {
-                            document.getElementById('loadingScreen').style.display = 'none';
-                            document.getElementById('app').style.display = 'block';
-                            
-                            // Initialize app
-                            if (typeof CodeEditor !== 'undefined') {
-                                window.app = new CodeEditor();
-                            }
-                        }, 500);
-                    }, 300);
-                }
-                progressBar.style.width = progress + '%';
-            }, 150);
-        });
-        
-        // Handle touch events for mobile
-        document.addEventListener('touchstart', function() {}, {passive: true});
-        document.addEventListener('touchmove', function() {}, {passive: true});
-    </script>
+    <!-- JavaScript -->
+    <script src="js/script.js"></script>
+    <script src="js/home.js"></script>
 </body>
 </html>
