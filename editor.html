@@ -3,141 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرر الأكواد - تطوير المشروع</title>
+    <title>محرر الأكواد | تطوير المشروع</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
     
-    <!-- CSS الرئيسي -->
+    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- CSS للمحرر -->
     <link rel="stylesheet" href="css/editor.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
+    
+    <style>
+        /* أنماط خاصة بالمحرر */
+        :root {
+            --editor-bg: #0d1117;
+            --editor-sidebar: #161b22;
+            --editor-header: #161b22;
+            --editor-border: #30363d;
+            --editor-text: #c9d1d9;
+            --editor-primary: #58a6ff;
+            --editor-secondary: #238636;
+            --editor-accent: #f78166;
+        }
+        
+        body.dark-mode {
+            --editor-bg: #0d1117;
+            --editor-sidebar: #161b22;
+            --editor-header: #161b22;
+            --editor-border: #30363d;
+            --editor-text: #c9d1d9;
+        }
+        
+        body.light-mode {
+            --editor-bg: #ffffff;
+            --editor-sidebar: #f6f8fa;
+            --editor-header: #f6f8fa;
+            --editor-border: #d0d7de;
+            --editor-text: #24292f;
+        }
+    </style>
 </head>
-<body>
-    <!-- Loading -->
-    <div class="loading-screen" id="loading">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">جاري تحميل المحرر...</div>
+<body class="dark-mode">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loader">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+            <h2>جاري تحميل المحرر</h2>
+            <p>يتم تحميل مشروعك وتهيئة بيئة التطوير...</p>
+        </div>
     </div>
-    
-    <!-- Header -->
-    <header class="editor-header">
-        <div class="header-left">
-            <button class="btn btn-secondary" id="backBtn">
-                <i class="fas fa-arrow-right"></i>
-                العودة
-            </button>
-        </div>
-        
-        <div class="header-center">
-            <div class="logo">
-                <i class="fas fa-code"></i>
-                <h1 id="projectName">محرر الأكواد</h1>
-            </div>
-        </div>
-        
-        <div class="header-right">
-            <div class="buttons">
-                <button class="btn btn-primary" id="previewBtn">
-                    <i class="fas fa-eye"></i>
-                    معاينة
-                </button>
-                <button class="btn btn-success" id="saveBtn">
-                    <i class="fas fa-save"></i>
-                    حفظ
-                </button>
-                <button class="btn btn-info" id="downloadBtn">
-                    <i class="fas fa-download"></i>
-                    تحميل
-                </button>
-                <button class="btn btn-warning" id="addFileBtn">
-                    <i class="fas fa-plus"></i>
-                    ملف جديد
+
+    <!-- Editor Container -->
+    <div class="editor-container" id="editorContainer" style="display: none;">
+        <!-- Header -->
+        <header class="editor-header">
+            <div class="header-left">
+                <button class="btn btn-secondary" id="backBtn">
+                    <i class="fas fa-arrow-right"></i>
+                    العودة
                 </button>
             </div>
-        </div>
-    </header>
-    
-    <!-- Main Container -->
-    <div class="editor-container">
-        <!-- Sidebar -->
-        <aside class="editor-sidebar">
-            <div class="sidebar-section">
-                <h3><i class="fas fa-folder-open"></i> ملفات المشروع</h3>
-                <div class="files-list" id="filesList">
-                    <!-- الملفات ستظهر هنا ديناميكياً -->
+            
+            <div class="header-center">
+                <div class="project-info">
+                    <i class="fas fa-code"></i>
+                    <div>
+                        <h1 id="projectName">مشروع بدون عنوان</h1>
+                        <div class="project-status" id="projectStatus">
+                            <i class="fas fa-circle" style="color: #10b981;"></i>
+                            <span>تم الحفظ تلقائياً</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="sidebar-section">
-                <h3><i class="fas fa-tools"></i> الأدوات</h3>
-                <div class="tools-list">
-                    <button class="tool-btn" id="formatBtn">
-                        <i class="fas fa-indent"></i>
-                        تنسيق الكود
+            <div class="header-right">
+                <div class="editor-controls">
+                    <!-- زر تبديل الوضع الليلي -->
+                    <button class="btn btn-icon" id="themeToggle" title="تبديل الوضع المظلم">
+                        <i class="fas fa-moon"></i>
                     </button>
-                    <button class="tool-btn" id="clearBtn">
-                        <i class="fas fa-eraser"></i>
-                        مسح الكود
+                    
+                    <!-- زر المعاينة -->
+                    <button class="btn btn-primary" id="previewBtn">
+                        <i class="fas fa-eye"></i>
+                        <span class="btn-text">معاينة</span>
                     </button>
-                    <button class="tool-btn" id="searchBtn">
-                        <i class="fas fa-search"></i>
-                        بحث واستبدال
+                    
+                    <!-- زر الحفظ -->
+                    <button class="btn btn-success" id="saveBtn">
+                        <i class="fas fa-save"></i>
+                        <span class="btn-text">حفظ</span>
+                    </button>
+                    
+                    <!-- زر التحميل -->
+                    <button class="btn btn-info" id="downloadBtn">
+                        <i class="fas fa-download"></i>
+                        <span class="btn-text">تحميل</span>
+                    </button>
+                    
+                    <!-- زر إضافة ملف -->
+                    <button class="btn btn-warning" id="addFileBtn">
+                        <i class="fas fa-plus"></i>
+                        <span class="btn-text">ملف جديد</span>
                     </button>
                 </div>
             </div>
-            
-            <div class="sidebar-footer">
-                <button class="btn btn-primary" id="backToHome">
-                    <i class="fas fa-home"></i>
-                    العودة للرئيسية
-                </button>
-                <button class="btn btn-secondary" id="fileManagerBtn">
-                    <i class="fas fa-cog"></i>
-                    إدارة الملفات
-                </button>
+        </header>
+
+        <!-- Main Content -->
+        <div class="editor-main">
+            <!-- Sidebar -->
+            <aside class="editor-sidebar">
+                <div class="sidebar-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-folder-open"></i> ملفات المشروع</h3>
+                        <button class="btn btn-icon btn-sm" id="refreshFiles" title="تحديث القائمة">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="files-list" id="filesList">
+                        <!-- الملفات ستظهر هنا ديناميكياً -->
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-tools"></i> الأدوات</h3>
+                    <div class="tools-list">
+                        <button class="tool-btn" id="formatBtn">
+                            <i class="fas fa-indent"></i>
+                            تنسيق الكود
+                        </button>
+                        <button class="tool-btn" id="clearBtn">
+                            <i class="fas fa-eraser"></i>
+                            مسح الكود
+                        </button>
+                        <button class="tool-btn" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                            بحث واستبدال
+                        </button>
+                        <button class="tool-btn" id="fullscreenBtn">
+                            <i class="fas fa-expand"></i>
+                            ملء الشاشة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-info-circle"></i> معلومات المشروع</h3>
+                    <div class="project-details" id="projectDetails">
+                        <!-- تفاصيل المشروع ستظهر هنا ديناميكياً -->
+                    </div>
+                </div>
+                
+                <div class="sidebar-footer">
+                    <button class="btn btn-primary btn-block" id="backToHome">
+                        <i class="fas fa-home"></i>
+                        العودة للرئيسية
+                    </button>
+                    <button class="btn btn-secondary btn-block" id="fileManagerBtn">
+                        <i class="fas fa-cog"></i>
+                        إدارة الملفات
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <main class="editor-area">
+                <!-- Editor Tabs -->
+                <div class="editor-tabs" id="editorTabs">
+                    <!-- التبويبات ستظهر هنا ديناميكياً -->
+                </div>
+
+                <!-- Editor Content -->
+                <div class="editor-content" id="editorContent">
+                    <!-- المحرر الرئيسي -->
+                    <div class="code-editor" id="codeEditor">
+                        <div class="editor-header">
+                            <div class="file-info">
+                                <i class="fas fa-file-code"></i>
+                                <span id="currentFileName">اختر ملفاً للبدء</span>
+                            </div>
+                            <div class="editor-actions">
+                                <select class="language-select" id="languageSelect">
+                                    <option value="html">HTML</option>
+                                    <option value="css">CSS</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="python">Python</option>
+                                    <option value="php">PHP</option>
+                                    <option value="json">JSON</option>
+                                    <option value="xml">XML</option>
+                                    <option value="markdown">Markdown</option>
+                                </select>
+                                <button class="btn btn-icon" id="copyCode" title="نسخ الكود">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="code-area">
+                            <textarea id="codeInput" placeholder="اكتب كودك هنا..."></textarea>
+                            <div class="line-numbers" id="lineNumbers">
+                                <!-- أرقام الأسطر ستظهر هنا -->
+                            </div>
+                        </div>
+                        <div class="editor-footer">
+                            <div class="editor-stats">
+                                <span id="lineCount">0 أسطر</span>
+                                <span id="charCount">0 أحرف</span>
+                                <span id="cursorPos">السطر: 1، العمود: 1</span>
+                            </div>
+                            <div class="editor-help">
+                                <span>Ctrl+S للحفظ • Ctrl+F للبحث • F11 لملء الشاشة</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview Panel -->
+                    <div class="preview-panel" id="previewPanel">
+                        <div class="preview-header">
+                            <h3><i class="fas fa-eye"></i> معاينة مباشرة</h3>
+                            <div class="preview-controls">
+                                <button class="btn btn-sm" id="refreshPreview">
+                                    <i class="fas fa-redo"></i>
+                                    تحديث
+                                </button>
+                                <button class="btn btn-sm" id="togglePreview">
+                                    <i class="fas fa-times"></i>
+                                    إغلاق
+                                </button>
+                            </div>
+                        </div>
+                        <div class="preview-content">
+                            <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+                            <div class="preview-loading" id="previewLoading">
+                                <div class="spinner"></div>
+                                <p>جاري تحميل المعاينة...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Status Bar -->
+        <footer class="editor-footer">
+            <div class="status-bar">
+                <div class="status-item">
+                    <i class="fas fa-code-branch"></i>
+                    <span>الإصدار: 1.0</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-clock"></i>
+                    <span id="lastSaved">لم يتم الحفظ بعد</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-keyboard"></i>
+                    <span id="currentLanguage">اختر لغة</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-wifi"></i>
+                    <span>متصل</span>
+                </div>
             </div>
-        </aside>
-        
-        <!-- Editor Area -->
-        <main class="editor-main">
-            <!-- Tabs -->
-            <div class="editor-tabs" id="editorTabs">
-                <!-- التبويبات ستظهر هنا ديناميكياً -->
-            </div>
-            
-            <!-- Editors -->
-            <div class="editors-area" id="editorsArea">
-                <!-- المحررات ستظهر هنا ديناميكياً -->
-            </div>
-        </main>
+        </footer>
     </div>
-    
+
     <!-- Modals -->
     
-    <!-- Modal إضافة ملف جديد -->
-    <div class="modal-overlay" id="addFileModal">
-        <div class="modal">
+    <!-- New File Modal -->
+    <div class="modal" id="newFileModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-plus"></i>
-                    إضافة ملف جديد
-                </h2>
-                <button class="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3><i class="fas fa-file-plus"></i> ملف جديد</h3>
+                <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="addFileForm">
+                <form id="newFileForm">
                     <div class="form-group">
-                        <label for="newFileName">اسم الملف</label>
-                        <input type="text" id="newFileName" class="form-control" 
-                               placeholder="مثال: main.js أو style.css" required>
-                        <small class="form-text">يجب أن يحتوي الاسم على امتداد الملف (مثل .html, .css, .js, .py, .php, الخ)</small>
+                        <label for="fileName">اسم الملف</label>
+                        <input type="text" id="fileName" class="form-control" 
+                               placeholder="مثال: script.js أو styles.css" required>
+                        <small class="form-hint">يجب أن يحتوي الاسم على امتداد الملف</small>
                     </div>
                     
                     <div class="form-group">
@@ -161,7 +317,6 @@
                             <option value="sql">SQL</option>
                             <option value="markdown">Markdown</option>
                             <option value="text">نص عادي</option>
-                            <option value="other">أخرى</option>
                         </select>
                     </div>
                     
@@ -173,116 +328,152 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary close-modal">إلغاء</button>
-                <button class="btn btn-primary" id="submitAddFile">
+                <button class="btn btn-secondary modal-close">إلغاء</button>
+                <button class="btn btn-primary" id="createFileBtn">
                     <i class="fas fa-plus"></i>
-                    إضافة
+                    إنشاء الملف
                 </button>
             </div>
         </div>
     </div>
     
-    <!-- Modal إدارة الملفات -->
-    <div class="modal-overlay file-manager" id="fileManagerModal">
-        <div class="modal">
+    <!-- File Manager Modal -->
+    <div class="modal modal-lg" id="fileManagerModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-cog"></i>
-                    إدارة الملفات
-                </h2>
-                <button class="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3><i class="fas fa-folder"></i> إدارة الملفات</h3>
+                <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="file-list-container" id="fileManagerList">
-                    <!-- قائمة الملفات للإدارة ستظهر هنا -->
+                <div class="file-manager">
+                    <div class="file-manager-header">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="fileSearch" placeholder="ابحث عن ملف...">
+                        </div>
+                        <button class="btn btn-primary" id="addFileFromManager">
+                            <i class="fas fa-plus"></i>
+                            إضافة ملف
+                        </button>
+                    </div>
+                    
+                    <div class="file-list" id="fileManagerList">
+                        <!-- قائمة الملفات للإدارة ستظهر هنا -->
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary close-modal">إغلاق</button>
-                <button class="btn btn-primary" id="addNewFileFromManager">
-                    <i class="fas fa-plus"></i>
-                    إضافة ملف جديد
-                </button>
+                <button class="btn btn-secondary modal-close">إغلاق</button>
             </div>
         </div>
     </div>
     
-    <!-- Modal البحث والاستبدال -->
-    <div class="modal-overlay" id="searchModal">
-        <div class="modal">
+    <!-- Search & Replace Modal -->
+    <div class="modal" id="searchModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">
-                    <i class="fas fa-search"></i>
-                    بحث واستبدال
-                </h2>
-                <button class="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3><i class="fas fa-search"></i> بحث واستبدال</h3>
+                <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="searchForm">
                     <div class="form-group">
                         <label for="searchText">بحث عن:</label>
                         <input type="text" id="searchText" class="form-control" 
-                               placeholder="أدخل النص للبحث عنه">
+                               placeholder="أدخل النص للبحث عنه" autocomplete="off">
                     </div>
                     
                     <div class="form-group">
                         <label for="replaceText">استبدال بـ:</label>
                         <input type="text" id="replaceText" class="form-control" 
-                               placeholder="أدخل النص البديل">
+                               placeholder="أدخل النص البديل" autocomplete="off">
                     </div>
                     
-                    <div class="form-group">
-                        <label>
+                    <div class="form-options">
+                        <label class="checkbox">
                             <input type="checkbox" id="matchCase">
-                            مطابقة حالة الأحرف
+                            <span>مطابقة حالة الأحرف</span>
                         </label>
+                        <label class="checkbox">
+                            <input type="checkbox" id="wholeWord">
+                            <span>كلمة كاملة</span>
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" id="regexSearch">
+                            <span>تعبير نمطي</span>
+                        </label>
+                    </div>
+                    
+                    <div class="search-results" id="searchResults">
+                        <!-- نتائج البحث ستظهر هنا -->
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary close-modal">إلغاء</button>
-                <button class="btn btn-primary" id="searchBtnModal">
-                    <i class="fas fa-search"></i>
-                    بحث
-                </button>
-                <button class="btn btn-success" id="replaceBtnModal">
-                    <i class="fas fa-exchange-alt"></i>
-                    استبدال
-                </button>
-                <button class="btn btn-warning" id="replaceAllBtnModal">
-                    <i class="fas fa-sync-alt"></i>
-                    استبدال الكل
-                </button>
+                <div class="search-buttons">
+                    <button class="btn btn-secondary" id="prevResult">
+                        <i class="fas fa-arrow-up"></i>
+                        السابق
+                    </button>
+                    <button class="btn btn-secondary" id="nextResult">
+                        <i class="fas fa-arrow-down"></i>
+                        التالي
+                    </button>
+                    <button class="btn btn-primary" id="searchActionBtn">
+                        <i class="fas fa-search"></i>
+                        بحث
+                    </button>
+                    <button class="btn btn-success" id="replaceBtn">
+                        <i class="fas fa-exchange-alt"></i>
+                        استبدال
+                    </button>
+                    <button class="btn btn-warning" id="replaceAllBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        استبدال الكل
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Modal الخروج -->
-    <div class="modal-overlay" id="exitModal">
-        <div class="modal">
+    <!-- Exit Modal -->
+    <div class="modal" id="exitModal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h3>تأكيد الخروج</h3>
-                <button class="close-modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h3><i class="fas fa-sign-out-alt"></i> تأكيد الخروج</h3>
+                <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p>هل تريد حفظ التغييرات قبل الخروج؟</p>
+                <div class="exit-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <h4>هل تريد حفظ التغييرات قبل الخروج؟</h4>
+                        <p>لديك تغييرات غير محفوظة في المشروع الحالي.</p>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="exitWithoutSave">خروج بدون حفظ</button>
-                <button class="btn btn-primary" id="saveAndExit">حفظ وخروج</button>
-                <button class="btn btn-secondary close-modal">إلغاء</button>
+                <button class="btn btn-secondary" id="exitWithoutSave">
+                    خروج بدون حفظ
+                </button>
+                <button class="btn btn-primary" id="saveAndExit">
+                    حفظ وخروج
+                </button>
+                <button class="btn btn-secondary modal-close">
+                    إلغاء
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Toast Messages -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
-    <!-- JavaScript -->
-    <script src="js/script.js"></script>
+    <!-- JavaScript Files -->
+    <script src="js/app.js"></script>
     <script src="js/editor.js"></script>
 </body>
 </html>
