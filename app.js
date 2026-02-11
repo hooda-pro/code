@@ -1,3 +1,18 @@
+window.addEventListener("load", function () {
+    const loadingScreen = document.getElementById("loadingScreen");
+    const mainContainer = document.getElementById("mainContainer");
+
+    if (loadingScreen && mainContainer) {
+        loadingScreen.style.opacity = "0";
+
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+            mainContainer.style.display = "block";
+        }, 500);
+    }
+});
+
+
 // ===== تطبيق محرر الأكواد الذكي =====
 // تم التطوير بواسطة: أحمد التميمي
 // تاريخ الإصدار: 2024
@@ -1512,4 +1527,5 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
 
