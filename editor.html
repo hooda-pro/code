@@ -53,17 +53,37 @@
 </head>
 <body class="dark-mode">
     <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loader">
-                <div class="loader-circle"></div>
-                <div class="loader-circle"></div>
-                <div class="loader-circle"></div>
-            </div>
-            <h2>جاري تحميل المحرر</h2>
-            <p>يتم تحميل مشروعك وتهيئة بيئة التطوير...</p>
+   <!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
         </div>
+        <h2>جاري التحميل</h2>
+        <p>يتم تحميل بيئة التطوير المتكاملة</p>
     </div>
+</div>
+
+<!-- Editor Container (مخفي في البداية) -->
+<div class="editor-container" id="editorContainer" style="display: none;">
+    <div class="editor-header">رأس المحرر</div>
+    <div class="editor-main">
+        <div class="editor-sidebar">الشريط الجانبي</div>
+        <div class="editor-area">منطقة الكود</div>
+    </div>
+    <div class="editor-footer">شريط الحالة</div>
+</div>
+
+<script>
+  // بعد 3 ثواني، نختفي Loading Screen ونظهر المحرر
+  setTimeout(() => {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('editorContainer').style.display = 'flex';
+  }, 3000);
+</script>
+
 
     <!-- Editor Container -->
     <div class="editor-container" id="editorContainer" style="display: none;">
@@ -480,3 +500,4 @@
 </body>
 
 </html>
+
