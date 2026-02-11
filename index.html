@@ -20,22 +20,6 @@
 </head>
 <body>
 
-<script>
-window.addEventListener("load", function () {
-    const loading = document.getElementById("loadingScreen");
-    const main = document.getElementById("mainContainer");
-
-    if (loading && main) {
-        loading.style.opacity = "0";
-        setTimeout(() => {
-            loading.style.display = "none";
-            main.style.display = "block";
-        }, 500);
-    }
-});
-</script>
-
-    
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
@@ -444,5 +428,6 @@ window.addEventListener("load", function () {
 </body>
 
 </html>
+
 
 
