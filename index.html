@@ -19,6 +19,23 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
 </head>
 <body>
+
+<script>
+window.addEventListener("load", function () {
+    const loading = document.getElementById("loadingScreen");
+    const main = document.getElementById("mainContainer");
+
+    if (loading && main) {
+        loading.style.opacity = "0";
+        setTimeout(() => {
+            loading.style.display = "none";
+            main.style.display = "block";
+        }, 500);
+    }
+});
+</script>
+
+    
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
@@ -427,4 +444,5 @@
 </body>
 
 </html>
+
 
