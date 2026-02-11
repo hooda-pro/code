@@ -1031,4 +1031,26 @@ input:checked + .toggle-slider:before {
         opacity: 1;
         transform: translateY(0);
     }
+
+}
+
+@media (max-width: 768px) {
+
+  .editor-main {
+    flex-direction: column;
+  }
+
+  .editor-sidebar {
+    width: 100%;
+    height: auto;
+  }
+
+  .editor-area {
+    width: 100%;
+  }
+
+  .editor-header {
+    font-size: 14px;
+  }
+
 }
