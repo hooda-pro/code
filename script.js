@@ -1,3 +1,8 @@
+window.addEventListener("error", function(e) {
+    console.log("Script error caught:", e.message);
+});
+
+
 // الصفحة الرئيسية - JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     console.log('صفحة البداية جاهزة');
@@ -21,62 +26,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // وظيفة تهيئة القائمة الجانبية
     function initSideMenu() {
-        const menuToggle = document.getElementById('menuToggle');
-        const sideMenu = document.getElementById('sideMenu');
-        const closeMenu = document.getElementById('closeMenu');
-        const menuItems = document.querySelectorAll('.menu-item');
-        
-        // فتح/إغلاق القائمة
-        menuToggle.addEventListener('click', function() {
-            sideMenu.classList.toggle('open');
-        });
-        
+    const menuToggle = document.getElementById('menuToggle');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenu = document.getElementById('closeMenu');
+    const menuItems = document.querySelectorAll('.menu-item');
+
+    if (!menuToggle || !sideMenu) return;
+
+    menuToggle.addEventListener('click', function() {
+        sideMenu.classList.toggle('open');
+    });
+
+    if (closeMenu) {
         closeMenu.addEventListener('click', function() {
             sideMenu.classList.remove('open');
         });
-        
-        // إغلاق القائمة عند النقر خارجها
-        document.addEventListener('click', function(event) {
-            if (!sideMenu.contains(event.target) && !menuToggle.contains(event.target)) {
-                sideMenu.classList.remove('open');
-            }
-        });
-        
-        // التنقل بين عناصر القائمة
-        menuItems.forEach(item => {
-            item.addEventListener('click', function() {
-                // إزالة النشاط من جميع العناصر
-                menuItems.forEach(i => i.classList.remove('active'));
-                // إضافة النشاط للعنصر الحالي
-                this.classList.add('active');
-                
-                // تنفيذ الإجراء المناسب
-                const id = this.id;
-                switch(id) {
-                    case 'homeMenuItem':
-                        scrollToSection('app-header');
-                        break;
-                    case 'sitesMenuItem':
-                        scrollToSection('sitesSection');
-                        break;
-                    case 'whoAmIMenuItem':
-                        openModal('whoAmIModal');
-                        break;
-                    case 'publishMenuItem':
-                        openModal('publishModal');
-                        break;
-                    case 'newSiteMenuItem':
-                        openModal('createSiteModal');
-                        break;
-                }
-                
-                // إغلاق القائمة على الموبايل
-                if (window.innerWidth <= 768) {
-                    sideMenu.classList.remove('open');
-                }
-            });
-        });
     }
+}
+
     
     // وظيفة تهيئة الأحداث
     function initEvents() {

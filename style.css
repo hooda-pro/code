@@ -27,11 +27,6 @@
     --transition: all 0.3s ease;
 }
 
---glass-blur: blur(10px);
---glass-border: rgba(255, 255, 255, 0.1);
---gradient-primary: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-
-
 html {
     scroll-behavior: smooth;
 }
@@ -1322,5 +1317,4 @@ body {
     .footer p {
         color: #666;
     }
-
 }
