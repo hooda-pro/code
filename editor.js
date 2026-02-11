@@ -113,6 +113,9 @@ function initEditorComponents() {
     // تحميل الوضع الحالي من localStorage
     loadTheme();
     
+    // ** إضافة: تهيئة عناصر التحكم بالجوال **
+    initMobileControls();
+    
     console.log('✅ المحرر جاهز للاستخدام');
 }
 
@@ -370,6 +373,128 @@ function initSidebar() {
         fileSearch.addEventListener('input', function() {
             filterFiles(this.value);
         });
+    }
+}
+
+// ===== وظائف الجوال =====
+function initMobileControls() {
+    // زر القائمة الجانبية
+    const menuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.getElementById('editorSidebar');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const bottomMenu = document.getElementById('bottomMenu');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    }
+
+    if (closeSidebar) {
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    }
+
+    // إغلاق الشريط الجانبي عند النقر خارجه
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && !bottomMenu?.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        }
+    });
+
+    // قائمة المزيد المنسدلة
+    const moreBtn = document.getElementById('mobileMoreBtn');
+    const dropdown = document.getElementById('mobileDropdown');
+
+    if (moreBtn && dropdown) {
+        moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('show');
+        });
+
+        // إغلاق القائمة عند النقر خارجها
+        document.addEventListener('click', (e) => {
+            if (!moreBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    }
+
+    // أزرار القائمة المنسدلة
+    document.getElementById('mobileAddFile')?.addEventListener('click', () => {
+        showModal('newFileModal');
+        dropdown?.classList.remove('show');
+    });
+
+    document.getElementById('mobileDownload')?.addEventListener('click', () => {
+        downloadProject();
+        dropdown?.classList.remove('show');
+    });
+
+    document.getElementById('mobileFormat')?.addEventListener('click', () => {
+        formatCode();
+        dropdown?.classList.remove('show');
+    });
+
+    document.getElementById('mobileFullscreen')?.addEventListener('click', () => {
+        toggleFullscreen();
+        dropdown?.classList.remove('show');
+    });
+
+    // الشريط السفلي
+    document.getElementById('bottomSave')?.addEventListener('click', saveProject);
+    document.getElementById('bottomPreview')?.addEventListener('click', togglePreview);
+    document.getElementById('bottomNewFile')?.addEventListener('click', () => showModal('newFileModal'));
+    document.getElementById('bottomMenu')?.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+    });
+
+    // تحسين تجربة التمرير في القوائم
+    if (window.innerWidth <= 768) {
+        const modals = document.querySelectorAll('.modal-content');
+        modals.forEach(modal => {
+            modal.addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            });
+        });
+    }
+}
+
+// تعديل دالة togglePreview لدعم الجوال
+function togglePreview() {
+    const previewPanel = document.getElementById('previewPanel');
+    if (!previewPanel) return;
+
+    if (window.innerWidth <= 768) {
+        // على الجوال: نستخدم الفئة active للتحكم بالظهور
+        previewPanel.classList.toggle('active');
+        window.editorState.isPreviewVisible = previewPanel.classList.contains('active');
+        
+        const btn = document.getElementById('previewBtn');
+        const bottomPreview = document.getElementById('bottomPreview');
+        
+        if (window.editorState.isPreviewVisible) {
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            if (bottomPreview) bottomPreview.innerHTML = '<i class="fas fa-eye-slash"></i><span>إخفاء</span>';
+        } else {
+            btn.innerHTML = '<i class="fas fa-eye"></i>';
+            if (bottomPreview) bottomPreview.innerHTML = '<i class="fas fa-eye"></i><span>معاينة</span>';
+        }
+    } else {
+        // سطح المكتب: استخدم التصميم القديم
+        if (window.editorState.isPreviewVisible) {
+            previewPanel.classList.add('collapsed');
+            window.editorState.isPreviewVisible = false;
+            document.getElementById('previewBtn').innerHTML = '<i class="fas fa-eye-slash"></i> <span class="btn-text">إظهار</span>';
+        } else {
+            previewPanel.classList.remove('collapsed');
+            window.editorState.isPreviewVisible = true;
+            document.getElementById('previewBtn').innerHTML = '<i class="fas fa-eye"></i> <span class="btn-text">معاينة</span>';
+            updatePreview();
+        }
     }
 }
 
@@ -1035,23 +1160,8 @@ function refreshPreview() {
     showToast('تم تحديث المعاينة', 'info');
 }
 
-// تبديل عرض المعاينة
-function togglePreview() {
-    const previewPanel = document.getElementById('previewPanel');
-    
-    if (!previewPanel) return;
-    
-    if (window.editorState.isPreviewVisible) {
-        previewPanel.classList.add('collapsed');
-        window.editorState.isPreviewVisible = false;
-        document.getElementById('previewBtn').innerHTML = '<i class="fas fa-eye-slash"></i> <span class="btn-text">إظهار</span>';
-    } else {
-        previewPanel.classList.remove('collapsed');
-        window.editorState.isPreviewVisible = true;
-        document.getElementById('previewBtn').innerHTML = '<i class="fas fa-eye"></i> <span class="btn-text">معاينة</span>';
-        updatePreview();
-    }
-}
+// تبديل عرض المعاينة (تم تعديلها أعلاه)
+// ... تم التعديل في الأعلى ...
 
 // ===== التحميل =====
 
@@ -1811,7 +1921,7 @@ function hideAllModals() {
     document.body.style.overflow = 'auto';
 }
 
-// إظهار رسائل Toast
+// إظهار رسائل Toast (معدلة للجوال)
 function showToast(message, type = 'info') {
     const toastContainer = document.getElementById('toastContainer');
     if (!toastContainer) return;

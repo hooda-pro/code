@@ -2,8 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>محرر الأكواد | تطوير المشروع</title>
     
     <!-- Font Awesome -->
@@ -18,40 +17,8 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
-    
-    <style>
-        /* أنماط خاصة بالمحرر */
-        :root {
-            --editor-bg: #0d1117;
-            --editor-sidebar: #161b22;
-            --editor-header: #161b22;
-            --editor-border: #30363d;
-            --editor-text: #c9d1d9;
-            --editor-primary: #58a6ff;
-            --editor-secondary: #238636;
-            --editor-accent: #f78166;
-        }
-        
-        body.dark-mode {
-            --editor-bg: #0d1117;
-            --editor-sidebar: #161b22;
-            --editor-header: #161b22;
-            --editor-border: #30363d;
-            --editor-text: #c9d1d9;
-        }
-        
-        body.light-mode {
-            --editor-bg: #ffffff;
-            --editor-sidebar: #f6f8fa;
-            --editor-header: #f6f8fa;
-            --editor-border: #d0d7de;
-            --editor-text: #24292f;
-        }
-    </style>
 </head>
 <body class="dark-mode">
-
-    
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
@@ -70,9 +37,13 @@
         <!-- Header -->
         <header class="editor-header">
             <div class="header-left">
+                <!-- زر القائمة الجانبية (يظهر فقط على الجوال) -->
+                <button class="btn btn-icon mobile-menu-toggle" id="mobileMenuToggle" title="القائمة">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <button class="btn btn-secondary" id="backBtn">
                     <i class="fas fa-arrow-right"></i>
-                    العودة
+                    <span class="btn-text">العودة</span>
                 </button>
             </div>
             
@@ -108,25 +79,50 @@
                         <span class="btn-text">حفظ</span>
                     </button>
                     
-                    <!-- زر التحميل -->
-                    <button class="btn btn-info" id="downloadBtn">
+                    <!-- زر إضافة ملف (يظهر في سطح المكتب فقط) -->
+                    <button class="btn btn-warning desktop-only" id="addFileBtn">
+                        <i class="fas fa-plus"></i>
+                        <span class="btn-text">ملف جديد</span>
+                    </button>
+                    
+                    <!-- زر التحميل (يظهر في سطح المكتب فقط) -->
+                    <button class="btn btn-info desktop-only" id="downloadBtn">
                         <i class="fas fa-download"></i>
                         <span class="btn-text">تحميل</span>
                     </button>
                     
-                    <!-- زر إضافة ملف -->
-                    <button class="btn btn-warning" id="addFileBtn">
-                        <i class="fas fa-plus"></i>
-                        <span class="btn-text">ملف جديد</span>
-                    </button>
+                    <!-- قائمة المزيد للجوال (تظهر فقط على الشاشات الصغيرة) -->
+                    <div class="mobile-more-menu">
+                        <button class="btn btn-icon" id="mobileMoreBtn" title="المزيد">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <div class="mobile-dropdown" id="mobileDropdown">
+                            <button class="dropdown-item" id="mobileAddFile">
+                                <i class="fas fa-plus"></i> ملف جديد
+                            </button>
+                            <button class="dropdown-item" id="mobileDownload">
+                                <i class="fas fa-download"></i> تحميل
+                            </button>
+                            <button class="dropdown-item" id="mobileFormat">
+                                <i class="fas fa-indent"></i> تنسيق
+                            </button>
+                            <button class="dropdown-item" id="mobileFullscreen">
+                                <i class="fas fa-expand"></i> ملء الشاشة
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
         <div class="editor-main">
-            <!-- Sidebar -->
-            <aside class="editor-sidebar">
+            <!-- Sidebar (على الجوال تكون منزلقة) -->
+            <aside class="editor-sidebar" id="editorSidebar">
+                <div class="sidebar-header mobile-only">
+                    <h3>القائمة</h3>
+                    <button class="btn btn-icon" id="closeSidebar"><i class="fas fa-times"></i></button>
+                </div>
                 <div class="sidebar-section">
                     <div class="section-header">
                         <h3><i class="fas fa-folder-open"></i> ملفات المشروع</h3>
@@ -134,10 +130,7 @@
                             <i class="fas fa-redo"></i>
                         </button>
                     </div>
-                    
-                    <div class="files-list" id="filesList">
-                        <!-- الملفات ستظهر هنا ديناميكياً -->
-                    </div>
+                    <div class="files-list" id="filesList"></div>
                 </div>
                 
                 <div class="sidebar-section">
@@ -164,9 +157,7 @@
                 
                 <div class="sidebar-section">
                     <h3><i class="fas fa-info-circle"></i> معلومات المشروع</h3>
-                    <div class="project-details" id="projectDetails">
-                        <!-- تفاصيل المشروع ستظهر هنا ديناميكياً -->
-                    </div>
+                    <div class="project-details" id="projectDetails"></div>
                 </div>
                 
                 <div class="sidebar-footer">
@@ -184,9 +175,7 @@
             <!-- Editor Area -->
             <main class="editor-area">
                 <!-- Editor Tabs -->
-                <div class="editor-tabs" id="editorTabs">
-                    <!-- التبويبات ستظهر هنا ديناميكياً -->
-                </div>
+                <div class="editor-tabs" id="editorTabs"></div>
 
                 <!-- Editor Content -->
                 <div class="editor-content" id="editorContent">
@@ -215,9 +204,7 @@
                         </div>
                         <div class="code-area">
                             <textarea id="codeInput" placeholder="اكتب كودك هنا..."></textarea>
-                            <div class="line-numbers" id="lineNumbers">
-                                <!-- أرقام الأسطر ستظهر هنا -->
-                            </div>
+                            <div class="line-numbers" id="lineNumbers"></div>
                         </div>
                         <div class="editor-footer">
                             <div class="editor-stats">
@@ -225,7 +212,7 @@
                                 <span id="charCount">0 أحرف</span>
                                 <span id="cursorPos">السطر: 1، العمود: 1</span>
                             </div>
-                            <div class="editor-help">
+                            <div class="editor-help desktop-only">
                                 <span>Ctrl+S للحفظ • Ctrl+F للبحث • F11 لملء الشاشة</span>
                             </div>
                         </div>
@@ -238,11 +225,11 @@
                             <div class="preview-controls">
                                 <button class="btn btn-sm" id="refreshPreview">
                                     <i class="fas fa-redo"></i>
-                                    تحديث
+                                    <span class="btn-text">تحديث</span>
                                 </button>
                                 <button class="btn btn-sm" id="togglePreview">
                                     <i class="fas fa-times"></i>
-                                    إغلاق
+                                    <span class="btn-text">إغلاق</span>
                                 </button>
                             </div>
                         </div>
@@ -258,8 +245,28 @@
             </main>
         </div>
 
-        <!-- Status Bar -->
-        <footer class="editor-footer">
+        <!-- Bottom Navigation Bar (يظهر فقط على الجوال) -->
+        <footer class="mobile-bottom-nav" id="mobileBottomNav">
+            <button class="bottom-nav-item" id="bottomSave">
+                <i class="fas fa-save"></i>
+                <span>حفظ</span>
+            </button>
+            <button class="bottom-nav-item" id="bottomPreview">
+                <i class="fas fa-eye"></i>
+                <span>معاينة</span>
+            </button>
+            <button class="bottom-nav-item" id="bottomNewFile">
+                <i class="fas fa-plus"></i>
+                <span>جديد</span>
+            </button>
+            <button class="bottom-nav-item" id="bottomMenu">
+                <i class="fas fa-bars"></i>
+                <span>قائمة</span>
+            </button>
+        </footer>
+
+        <!-- Status Bar (يظهر فقط على سطح المكتب) -->
+        <footer class="editor-footer desktop-only">
             <div class="status-bar">
                 <div class="status-item">
                     <i class="fas fa-code-branch"></i>
@@ -281,9 +288,7 @@
         </footer>
     </div>
 
-    <!-- Modals -->
-    
-    <!-- New File Modal -->
+    <!-- Modals (بدون تغيير جوهري) -->
     <div class="modal" id="newFileModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -340,7 +345,6 @@
         </div>
     </div>
     
-    <!-- File Manager Modal -->
     <div class="modal modal-lg" id="fileManagerModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -360,9 +364,7 @@
                         </button>
                     </div>
                     
-                    <div class="file-list" id="fileManagerList">
-                        <!-- قائمة الملفات للإدارة ستظهر هنا -->
-                    </div>
+                    <div class="file-list" id="fileManagerList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -371,7 +373,6 @@
         </div>
     </div>
     
-    <!-- Search & Replace Modal -->
     <div class="modal" id="searchModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -407,9 +408,7 @@
                         </label>
                     </div>
                     
-                    <div class="search-results" id="searchResults">
-                        <!-- نتائج البحث ستظهر هنا -->
-                    </div>
+                    <div class="search-results" id="searchResults"></div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -439,7 +438,6 @@
         </div>
     </div>
     
-    <!-- Exit Modal -->
     <div class="modal" id="exitModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -479,5 +477,4 @@
     <script src="app.js"></script>
     <script src="editor.js"></script>
 </body>
-
 </html>

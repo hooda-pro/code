@@ -1,4 +1,6 @@
 /* ===== أنماط محرر الأكواد ===== */
+/* تم التطوير بواسطة: أحمد التميمي */
+/* جميع الحقوق محفوظة © 2024 */
 
 /* متغيرات الوضع المظلم/الفاتح */
 :root {
@@ -52,7 +54,7 @@ body.light-mode {
 .editor-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100dvh;
     background: var(--editor-bg);
     color: var(--editor-text);
     transition: all 0.3s ease;
@@ -786,83 +788,288 @@ pre, code {
     }
 }
 
+/* ===== أنماط الجوال (شاشات حتى 768px) ===== */
 @media (max-width: 768px) {
+    /* إخفاء عناصر سطح المكتب */
+    .desktop-only {
+        display: none !important;
+    }
+
+    /* إظهار عناصر الجوال */
+    .mobile-only {
+        display: block;
+    }
+
+    /* تعديل الهيدر */
+    .editor-header {
+        padding: 0 10px;
+        height: 56px;
+    }
+
+    .header-left .btn-secondary {
+        display: none; /* إخفاء زر العودة النصي */
+    }
+
+    .mobile-menu-toggle {
+        display: flex !important;
+    }
+
+    .project-info h1 {
+        font-size: 16px;
+        max-width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-status span {
+        font-size: 11px;
+    }
+
+    .editor-controls .btn-text {
+        display: none;
+    }
+
+    .editor-controls .btn-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* قائمة المزيد المنسدلة */
+    .mobile-more-menu {
+        position: relative;
+        display: inline-block;
+    }
+
+    .mobile-dropdown {
+        display: none;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        background: var(--editor-sidebar);
+        border: 1px solid var(--editor-border);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        z-index: 1000;
+        min-width: 200px;
+        overflow: hidden;
+    }
+
+    .mobile-dropdown.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: var(--editor-text);
+        font-size: 15px;
+        text-align: right;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .dropdown-item i {
+        width: 20px;
+        color: var(--editor-primary);
+    }
+
+    .dropdown-item:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+    /* الشريط الجانبي - منزلق */
     .editor-sidebar {
         position: fixed;
-        right: 0;
-        top: 60px;
-        bottom: 30px;
-        z-index: 1000;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
+        right: -280px;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        z-index: 2000;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        border-left: none;
     }
-    
+
     .editor-sidebar.active {
-        transform: translateX(0);
+        right: 0;
     }
-    
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid var(--editor-border);
+    }
+
+    .sidebar-header h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+
+    /* لوحة المعاينة - منزلقة */
     .preview-panel {
         position: fixed;
         left: 0;
         right: 0;
-        top: 60px;
-        bottom: 30px;
-        z-index: 1000;
+        top: 56px;
+        bottom: 70px; /* مسافة للشريط السفلي */
+        width: 100% !important;
+        z-index: 1500;
         transform: translateX(100%);
         transition: transform 0.3s ease;
     }
-    
+
     .preview-panel.active {
         transform: translateX(0);
     }
-    
-    .editor-controls .btn-text {
-        display: none;
+
+    /* الشريط السفلي للجوال */
+    .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: var(--editor-header);
+        border-top: 1px solid var(--editor-border);
+        z-index: 1100;
+        padding: 8px 4px;
     }
-    
-    .editor-controls .btn {
-        width: 40px;
-        padding: 0;
-        justify-content: center;
-    }
-    
-    .header-center {
+
+    .bottom-nav-item {
         flex: 1;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        background: transparent;
+        border: none;
+        color: var(--editor-text);
+        font-size: 12px;
+        padding: 8px 0;
+        border-radius: 8px;
+        transition: background 0.2s;
     }
-    
-    .project-info h1 {
-        font-size: 16px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+
+    .bottom-nav-item i {
+        font-size: 20px;
+    }
+
+    .bottom-nav-item:active {
+        background: rgba(88, 166, 255, 0.2);
+    }
+
+    /* تعديل مساحة المحرر */
+    .editor-area {
+        margin-bottom: 70px; /* مساحة للشريط السفلي */
+    }
+
+    .code-area {
+        height: calc(100vh - 200px);
+    }
+
+    #codeInput {
+        padding: 15px 15px 15px 50px;
+        font-size: 13px;
+    }
+
+    .line-numbers {
+        width: 40px;
+        font-size: 13px;
+    }
+
+    .line-number {
+        height: 22px;
+        line-height: 22px;
+    }
+
+    /* تحسين المودالات للجوال */
+    .modal .modal-content {
+        width: 95%;
+        margin: 20px auto;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-lg .modal-content {
+        width: 95%;
+    }
+
+    .file-manager {
+        height: auto;
+        max-height: 70vh;
+    }
+
+    /* تحسين أزرار البحث */
+    .search-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .search-buttons .btn {
+        flex: 1 1 calc(50% - 8px);
+    }
+
+    /* توسيع منطقة اللمس */
+    .btn, 
+    .tool-btn,
+    .file-item,
+    .tab,
+    .bottom-nav-item,
+    .dropdown-item {
+        min-height: 44px;
+    }
+
+    .file-item {
+        padding: 12px;
+    }
+
+    .tab {
+        padding: 0 16px;
+        height: 44px;
     }
 }
 
 @media (max-width: 480px) {
     .editor-header {
-        padding: 0 10px;
+        padding: 0 8px;
     }
-    
-    .editor-controls {
-        gap: 5px;
+
+    .project-info h1 {
+        font-size: 14px;
+        max-width: 120px;
     }
-    
+
     .btn-icon {
-        width: 35px;
-        height: 35px;
+        width: 36px;
+        height: 36px;
     }
-    
+
     .language-select {
-        min-width: 120px;
+        min-width: 100px;
+        padding: 6px 8px;
+        font-size: 12px;
     }
-    
+
     .editor-stats {
         gap: 8px;
+        font-size: 11px;
     }
-    
-    .editor-help {
-        display: none;
+
+    .toast-container {
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        width: auto;
     }
 }
 
@@ -1031,26 +1238,4 @@ input:checked + .toggle-slider:before {
         opacity: 1;
         transform: translateY(0);
     }
-
-}
-
-@media (max-width: 768px) {
-
-  .editor-main {
-    flex-direction: column;
-  }
-
-  .editor-sidebar {
-    width: 100%;
-    height: auto;
-  }
-
-  .editor-area {
-    width: 100%;
-  }
-
-  .editor-header {
-    font-size: 14px;
-  }
-
 }
