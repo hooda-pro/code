@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <img src="image.jpg" ondragstart="return false;">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>محرر الأكواد الذكي | تطوير المواقع</title>
     <meta name="description" content="محرر أكواد متطور يدعم جميع لغات البرمجة مع معاينة فورية وتحميل مشاريع كاملة">
     
@@ -20,9 +19,6 @@
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
 </head>
 <body oncontextmenu="return false;">
-
-    <img src="image.jpg" ondragstart="return false;">
-
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-content">
@@ -37,7 +33,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="container" id="mainContainer">
+    <div class="container" id="mainContainer" style="display: none;">
         <!-- Header -->
         <header class="header">
             <nav class="navbar">
@@ -76,11 +72,11 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <h2>أنشئ مواقع ويب <span class="highlight">باحترافية</span></h2>
-                    <p class="subtitle">محرر أكواد متكامل يدعم جميع لغات البرمجة مع معاينة فورية وحفظ تلقائي</p>
+                    <p class="subtitle">محرر أكواد متكامل يدعم جميع لغات البرمجة مع معاينة منفصلة وحفظ تلقائي</p>
                     
                     <div class="hero-buttons">
                         <button class="btn btn-primary btn-lg" id="startProjectBtn">
-                            <i class="fas fa-rocket"></i> <title='انشئ مشروعك الان!!></title>
+                            <i class="fas fa-rocket"></i>
                             ابدأ مشروع جديد
                         </button>
                         <button class="btn btn-outline btn-lg" id="viewProjectsBtn">
@@ -101,7 +97,7 @@
                             <i class="fas fa-bolt"></i>
                             <div>
                                 <h3>فوري</h3>
-                                <p>معاينة مباشرة</p>
+                                <p>معاينة منفصلة</p>
                             </div>
                         </div>
                         <div class="stat">
@@ -129,13 +125,9 @@
 &lt;html lang="ar"&gt;
 &lt;head&gt;
     &lt;title&gt;موقعي الجديد&lt;/title&gt;
-    &lt;link rel="stylesheet" href="style.css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;div class="container"&gt;
-        &lt;h1&gt;مرحباً بالعالم!&lt;/h1&gt;
-        &lt;p&gt;تم إنشاء هذا الموقع باستخدام محرر الأكواد الذكي&lt;/p&gt;
-    &lt;/div&gt;
+    &lt;h1&gt;مرحباً بالعالم!&lt;/h1&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
                         </div>
@@ -162,11 +154,9 @@
                 </button>
             </div>
             
-            <div class="projects-grid" id="projectsGrid">
-                <!-- Projects will be loaded here dynamically -->
-            </div>
+            <div class="projects-grid" id="projectsGrid"></div>
             
-            <div class="empty-state" id="emptyProjects">
+            <div class="empty-state" id="emptyProjects" style="display: none;">
                 <div class="empty-icon">
                     <i class="fas fa-folder-open"></i>
                 </div>
@@ -188,49 +178,32 @@
             
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-code"></i></div>
                     <h3>محرر متعدد اللغات</h3>
-                    <p>يدعم HTML, CSS, JavaScript, PHP, Python وغيرها مع تلوين الصيغة المناسب</p>
+                    <p>يدعم HTML, CSS, JavaScript, PHP, Python وغيرها مع تلوين الصيغة</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <h3>معاينة فورية</h3>
-                    <p>شاهد التغييرات مباشرة أثناء الكتابة في نافذة معاينة منفصلة</p>
+                    <div class="feature-icon"><i class="fas fa-eye"></i></div>
+                    <h3>معاينة منفصلة</h3>
+                    <p>افتح المعاينة في تبويب جديد لمساحة أكبر للعمل</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
                     <h3>تصميم متجاوب</h3>
                     <p>المحرر يعمل بكفاءة على جميع الأجهزة والهواتف الذكية</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-cloud"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-cloud"></i></div>
                     <h3>حفظ تلقائي</h3>
                     <p>يتم حفظ عملك تلقائياً ولا داعي للقلق من فقدان البيانات</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-download"></i></div>
                     <h3>تصدير المشاريع</h3>
-                    <p>حمل مشروعك كاملاً في ملف ZIP أو انشره مباشرة على الإنترنت</p>
+                    <p>حمل مشروعك كاملاً في ملف ZIP</p>
                 </div>
-                
                 <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
+                    <div class="feature-icon"><i class="fas fa-search"></i></div>
                     <h3>بحث واستبدال</h3>
                     <p>ابحث عن أي نص في مشروعك واستبدله بسهولة</p>
                 </div>
@@ -245,38 +218,30 @@
                     <h3>محرر الأكواد الذكي</h3>
                     <p>أداة تطوير متكاملة لكل المبرمجين</p>
                 </div>
-                
                 <div class="footer-links">
                     <h4>روابط سريعة</h4>
                     <a href="#" data-section="home">الرئيسية</a>
                     <a href="#" data-section="projects">المشاريع</a>
                     <a href="#" data-section="features">المميزات</a>
-                    <!--<a href="#" id="contactBtn">اتصل بنا</a>-->
                 </div>
-                
                 <div class="footer-info">
                     <h4>المطور</h4>
-                    <p><i class="fas fa-user"></i>محمود احمد سعيد</p>
+                    <p><i class="fas fa-user"></i> محمود احمد سعيد</p>
                     <p><i class="fas fa-envelope"></i> hooda2024g1@example.com</p>
                     <p>
-    <i class="fab fa-whatsapp"></i>
-    <a href="https://wa.me/15592731960" target="_blank" rel="noopener">
-        +1 (559) 273-1960
-    </a>
-</p>
-
+                        <i class="fab fa-whatsapp"></i>
+                        <a href="https://wa.me/15592731960" target="_blank" rel="noopener">+1 (559) 273-1960</a>
+                    </p>
                 </div>
             </div>
-            
             <div class="footer-bottom">
                 <p>© 2026 محرر الأكواد الذكي. جميع الحقوق محفوظة.</p>
                 <p>تم التطوير بـ <i class="fas fa-heart"></i> للمبرمجين العرب</p>
             </div>
         </footer>
+    </div>
 
     <!-- Modals -->
-    
-    <!-- New Project Modal -->
     <div class="modal" id="newProjectModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -287,11 +252,8 @@
                 <form id="projectForm">
                     <div class="form-group">
                         <label for="projectName">اسم المشروع</label>
-                        <input type="text" id="projectName" class="form-control" 
-                               placeholder="أدخل اسم مشروعك" required>
-                        <small class="form-hint">يمكنك استخدام أي لغة (عربية، إنجليزية، الخ)</small>
+                        <input type="text" id="projectName" class="form-control" placeholder="أدخل اسم مشروعك" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="projectType">نوع المشروع</label>
                         <select id="projectType" class="form-control">
@@ -302,25 +264,21 @@
                             <option value="custom">مخصص</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="projectDescription">وصف المشروع (اختياري)</label>
-                        <textarea id="projectDescription" class="form-control" 
-                                  placeholder="وصف مختصر للمشروع..." rows="3"></textarea>
+                        <textarea id="projectDescription" class="form-control" rows="3"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">إلغاء</button>
                 <button class="btn btn-primary" id="createProjectBtn">
-                    <i class="fas fa-plus"></i>
-                    إنشاء المشروع
+                    <i class="fas fa-plus"></i> إنشاء المشروع
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- About Developer Modal -->
     <div class="modal" id="aboutModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -329,18 +287,13 @@
             </div>
             <div class="modal-body">
                 <div class="developer-profile">
-                    <div class="developer-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
+                    <div class="developer-avatar"><i class="fas fa-user"></i></div>
                     <h3>محمود احمد سعيد</h3>
                     <p class="developer-title">مطور ويب ومهندس برمجيات</p>
-                    
                     <div class="developer-info">
                         <p><i class="fas fa-briefcase"></i> خبرة في تطوير الويب</p>
-                        
-                        <p><i class="fas fa-map-marker-alt"></i>EG</p>
+                        <p><i class="fas fa-map-marker-alt"></i> EG</p>
                     </div>
-                    
                     <div class="developer-skills">
                         <h4>المهارات التقنية</h4>
                         <div class="skills-list">
@@ -354,80 +307,17 @@
                             <span class="skill-tag">Laravel</span>
                         </div>
                     </div>
-                    
-                    <div class="developer-contact">
-                        <h4>وسائل التواصل</h4>
-                        <div class="contact-list">
-                            <a href="#" class="contact-item">
-                                <i class="fas fa-envelope"></i>
-                                البريد الإلكتروني
-                            </a>
-                            <a href="#" class="contact-item">
-                                <i class="fab fa-twitter"></i>
-                                تويتر
-                            </a>
-                            <a href="#" class="contact-item">
-                                <i class="fab fa-github"></i>
-                                GitHub
-                            </a>
-                            <a href="#" class="contact-item">
-                                <i class="fab fa-linkedin"></i>
-                                LinkedIn
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Contact Modal -->
-    <!--<div class="modal" id="contactModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas a-headset"></i> تواصل معنا</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="contactName">اسمك</label>
-                        <input type="text" id="contactName" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contactEmail">البريد الإلكتروني</label>
-                        <input type="email" id="contactEmail" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contactSubject">الموضوع</label>
-                        <input type="text" id="contactSubject" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contactMessage">الرسالة</label>
-                        <textarea id="contactMessage" class="form-control" rows="5" required></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary modal-close">إلغاء</button>
-                <button class="btn btn-primary" id="sendMessageBtn">
-                    <i class="fas fa-paper-plane"></i>
-                    إرسال الرسالة
-                </button>
-            </div>
-        </div>
-    </div>-->
-
-    <!-- Toast Messages -->
+    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- JavaScript -->
+    <!-- JSZip Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Main App Script -->
     <script src="app.js"></script>
-    <script src="script.js"></script>
-
 </body>
 </html>
