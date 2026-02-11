@@ -13,10 +13,7 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="editor.css">
-<script src="app.js"></script>
-<script src="editor.js"></script>
-
+    <link rel="stylesheet" href="editor.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💻</text></svg>">
@@ -52,57 +49,20 @@
     </style>
 </head>
 <body class="dark-mode">
+
+    
     <!-- Loading Screen -->
-  <!-- شاشة التحميل -->
-<div class="loading-screen" id="loadingScreen">
-    <div class="loading-content">
-        <div class="loader">
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loader">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+            <h2>جاري تحميل المحرر</h2>
+            <p>يتم تحميل مشروعك وتهيئة بيئة التطوير...</p>
         </div>
-        <h2>جاري التحميل</h2>
-        <p>يتم تحميل بيئة التطوير المتكاملة</p>
     </div>
-</div>
-
-<!-- المحرر (مخفي في البداية) -->
-<div class="editor-container" id="editorContainer" style="display: none;">
-    <div class="editor-header">رأس المحرر</div>
-    <div class="editor-main">
-        <div class="editor-sidebar">الشريط الجانبي</div>
-        <div class="editor-area">منطقة الكود</div>
-    </div>
-    <div class="editor-footer">شريط الحالة</div>
-</div>
-
-<script>
-  // بعد 3 ثواني، نخفي شاشة التحميل ونظهر المحرر
-  setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('editorContainer').style.display = 'flex';
-  }, 3000);
-</script>
-
-
-<!-- Editor Container (مخفي في البداية) -->
-<div class="editor-container" id="editorContainer" style="display: none;">
-    <div class="editor-header">رأس المحرر</div>
-    <div class="editor-main">
-        <div class="editor-sidebar">الشريط الجانبي</div>
-        <div class="editor-area">منطقة الكود</div>
-    </div>
-    <div class="editor-footer">شريط الحالة</div>
-</div>
-
-<script>
-  // بعد 3 ثواني، نختفي Loading Screen ونظهر المحرر
-  setTimeout(() => {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('editorContainer').style.display = 'flex';
-  }, 3000);
-</script>
-
 
     <!-- Editor Container -->
     <div class="editor-container" id="editorContainer" style="display: none;">
@@ -515,9 +475,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
     <!-- JavaScript Files -->
-
+    <script src="app.js"></script>
+    <script src="editor.js"></script>
 </body>
-
 </html>
-
-
