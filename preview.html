@@ -2,16 +2,11 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>معاينة الموقع - محرر الأكواد</title>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- CSS الرئيسي -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
@@ -22,7 +17,6 @@
             flex-direction: column;
             background: #f8fafc;
         }
-        
         .preview-header {
             background: #1e293b;
             color: white;
@@ -30,523 +24,202 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        
-        .preview-header h1 {
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .preview-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .preview-content {
-            flex: 1;
-            background: white;
-            position: relative;
-        }
-        
+        .preview-header h1 { font-size: 18px; display: flex; align-items: center; gap: 10px; }
+        .preview-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .preview-content { flex: 1; position: relative; background: white; overflow: auto; display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
         .preview-frame {
             width: 100%;
             height: 100%;
             border: none;
-        }
-        
-        .loading-preview {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #64748b;
-        }
-        
-        .no-preview {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #64748b;
-            padding: 20px;
-        }
-        
-        .no-preview i {
-            font-size: 60px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        .device-simulator {
-            display: flex;
-            gap: 10px;
-            background: #334155;
-            padding: 10px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             border-radius: 8px;
-        }
-        
-        .device-btn {
-            background: #475569;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.3s ease;
         }
-        
-        .device-btn:hover {
-            background: #4a6ee0;
+        .preview-frame.desktop { max-width: 100%; height: 100%; border-radius: 0; }
+        .preview-frame.tablet { max-width: 768px; height: 1024px; border-radius: 20px; }
+        .preview-frame.mobile { max-width: 375px; height: 667px; border-radius: 30px; }
+        .loading-preview {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            text-align: center; color: #64748b;
         }
-        
-        .device-btn.active {
-            background: #4a6ee0;
-        }
-        
-        .preview-size {
-            color: #cbd5e1;
-            font-size: 14px;
-            background: #475569;
-            padding: 8px 15px;
-            border-radius: 6px;
+        .device-btn.active { background: #4a6ee0; }
+        .preview-size { color: #cbd5e1; font-size: 14px; background: #475569; padding: 8px 15px; border-radius: 6px; }
+        @media (max-width: 768px) {
+            .preview-header { flex-direction: column; align-items: stretch; }
+            .preview-actions { justify-content: center; }
+            .preview-content { padding: 10px; }
         }
     </style>
 </head>
 <body>
     <div class="preview-container">
         <div class="preview-header">
-            <div>
-                <h1>
-                    <i class="fas fa-eye"></i>
-                    معاينة الموقع
-                    <span id="siteName"></span>
-                </h1>
-            </div>
-            
+            <div><h1><i class="fas fa-eye"></i> معاينة الموقع <span id="siteName"></span></h1></div>
             <div class="preview-actions">
-                <div class="device-simulator">
-                    <button class="device-btn active" data-device="desktop">
-                        <i class="fas fa-desktop"></i>
-                        كمبيوتر
-                    </button>
-                    <button class="device-btn" data-device="tablet">
-                        <i class="fas fa-tablet-alt"></i>
-                        تابلت
-                    </button>
-                    <button class="device-btn" data-device="mobile">
-                        <i class="fas fa-mobile-alt"></i>
-                        موبايل
-                    </button>
+                <div class="device-simulator" style="display:flex; gap:5px;">
+                    <button class="btn btn-sm device-btn active" data-device="desktop"><i class="fas fa-desktop"></i> كمبيوتر</button>
+                    <button class="btn btn-sm device-btn" data-device="tablet"><i class="fas fa-tablet-alt"></i> تابلت</button>
+                    <button class="btn btn-sm device-btn" data-device="mobile"><i class="fas fa-mobile-alt"></i> موبايل</button>
                 </div>
-                
-                <div class="preview-size" id="previewSize">
-                    100% (1200px)
-                </div>
-                
-                <button class="btn btn-primary" id="refreshBtn">
-                    <i class="fas fa-redo"></i>
-                    تحديث
-                </button>
-                
-                <button class="btn btn-secondary" id="closeBtn">
-                    <i class="fas fa-times"></i>
-                    إغلاق
-                </button>
+                <span class="preview-size" id="previewSize">100% (كامل)</span>
+                <button class="btn btn-primary" id="refreshBtn"><i class="fas fa-redo"></i> تحديث</button>
+                <button class="btn btn-secondary" id="closeBtn"><i class="fas fa-times"></i> إغلاق</button>
             </div>
         </div>
-        
         <div class="preview-content">
             <div class="loading-preview" id="loadingPreview">
-                <div class="loading-spinner"></div>
-                <div style="margin-top: 20px;">جاري تحميل المعاينة...</div>
+                <div class="spinner" style="width:40px; height:40px; border:3px solid #f3f3f3; border-top:3px solid #4361ee; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
+                <div>جاري تحميل المعاينة...</div>
             </div>
-            
-            <div class="no-preview" id="noPreview" style="display: none;">
-                <i class="fas fa-exclamation-circle"></i>
-                <h3>لا توجد معاينة متاحة</h3>
-                <p>يرجى العودة للمحرر وحفظ الموقع أولاً</p>
-                <button class="btn btn-primary" id="backToEditor" style="margin-top: 20px;">
-                    <i class="fas fa-arrow-left"></i>
-                    العودة للمحرر
-                </button>
-            </div>
-            
-            <iframe class="preview-frame" id="previewFrame"></iframe>
+            <iframe class="preview-frame desktop" id="previewFrame"></iframe>
         </div>
     </div>
     
     <script>
-        // صفحة المعاينة - JavaScript
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('صفحة المعاينة جاهزة');
+            const previewFrame = document.getElementById('previewFrame');
+            const loading = document.getElementById('loadingPreview');
+            const siteNameSpan = document.getElementById('siteName');
             
-            // المتغيرات
-            let previewSite = null;
             let currentDevice = 'desktop';
+            let previewProject = null;
             
-            // تهيئة الصفحة
-            initPreview();
-            
-            // وظيفة تهيئة المعاينة
-            function initPreview() {
-                // محاولة تحميل الموقع من localStorage
-                try {
-                    const savedSite = localStorage.getItem('previewSite');
-                    if (savedSite) {
-                        previewSite = JSON.parse(savedSite);
-                        document.getElementById('siteName').textContent = ` - ${previewSite.name}`;
-                        renderPreview();
-                    } else {
-                        showNoPreview();
-                    }
-                } catch (error) {
-                    console.error('خطأ في تحميل المعاينة:', error);
-                    showNoPreview();
+            // تحميل المشروع من localStorage
+            try {
+                const saved = localStorage.getItem('previewProject');
+                if (saved) {
+                    previewProject = JSON.parse(saved);
+                    siteNameSpan.textContent = previewProject.name ? ` - ${previewProject.name}` : '';
+                    renderPreview();
+                } else {
+                    loading.innerHTML = '<i class="fas fa-exclamation-circle" style="font-size:48px; opacity:0.5; margin-bottom:20px;"></i><h3>لا توجد معاينة</h3><p>لم يتم العثور على مشروع للمعاينة</p>';
                 }
-                
-                // تهيئة الأحداث
-                setupEvents();
+            } catch(e) {
+                console.error(e);
+                loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:48px; color:var(--danger-color);"></i><h3>خطأ في تحميل المعاينة</h3>';
             }
-    
-            // وظيفة عرض المعاينة
+            
             function renderPreview() {
-                if (!previewSite) {
-                    showNoPreview();
-                    return;
-                }
-    
-                // إخفاء رسالة التحميل
-                document.getElementById('loadingPreview').style.display = 'none';
+                if (!previewProject) return;
+                loading.style.display = 'flex';
+                previewFrame.style.display = 'none';
                 
-                // جمع جميع الملفات في صفحة واحدة
+                // إنشاء محتوى HTML للمعاينة
                 let htmlContent = '';
+                let hasHtml = false;
                 
-                // البحث عن ملف HTML رئيسي
-                const htmlFiles = Object.keys(previewSite.files).filter(f => 
-                    f.endsWith('.html') || f.endsWith('.htm'));
+                // البحث عن ملف HTML
+                if (previewProject.files) {
+                    for (let fileName in previewProject.files) {
+                        if (fileName.endsWith('.html') || fileName.endsWith('.htm')) {
+                            htmlContent = previewProject.files[fileName];
+                            hasHtml = true;
+                            break;
+                        }
+                    }
+                }
                 
-                if (htmlFiles.length > 0) {
-                    htmlContent = previewSite.files[htmlFiles[0]];
-                    
-                    // دمج ملفات CSS
-                    const cssFiles = Object.keys(previewSite.files).filter(f => 
-                        f.endsWith('.css'));
-                    
-                    cssFiles.forEach(cssFile => {
-                        const cssContent = previewSite.files[cssFile];
-                        const styleTag = `<style>\n${cssContent}\n</style>`;
-                        htmlContent = htmlContent.replace('</head>', `${styleTag}\n</head>`);
-                    });
-                    
-                    // دمج ملفات JavaScript
-                    const jsFiles = Object.keys(previewSite.files).filter(f => 
-                        f.endsWith('.js') || f.endsWith('.ts'));
-                    
-                    jsFiles.forEach(jsFile => {
-                        const jsContent = previewSite.files[jsFile];
-                        const scriptTag = `<script>\n${jsContent}\n<\/script>`;
-                        htmlContent = htmlContent.replace('</body>', `${scriptTag}\n</body>`);
-                    });
-                    
-                    // إضافة Font Awesome إذا لم يكن موجود
+                if (!hasHtml) {
+                    // إنشاء صفحة افتراضية
+                    htmlContent = createSimplePreview(previewProject);
+                } else {
+                    // دمج CSS و JS
+                    let cssContent = '', jsContent = '';
+                    for (let fn in previewProject.files) {
+                        if (fn.endsWith('.css')) cssContent += previewProject.files[fn] + '\n';
+                        if (fn.endsWith('.js')) jsContent += previewProject.files[fn] + '\n';
+                    }
+                    if (cssContent) {
+                        htmlContent = htmlContent.replace('</head>', `<style>\n${cssContent}\n</style>\n</head>`);
+                    }
+                    if (jsContent) {
+                        htmlContent = htmlContent.replace('</body>', `<script>\n${jsContent}\n<\/script>\n</body>`);
+                    }
+                    // إضافة FontAwesome إن لم يكن موجوداً
                     if (!htmlContent.includes('font-awesome')) {
-                        const fontAwesome = '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">';
-                        htmlContent = htmlContent.replace('</head>', `${fontAwesome}\n</head>`);
+                        htmlContent = htmlContent.replace('</head>', `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">\n</head>`);
                     }
-                    
-                    // إضافة Google Fonts إذا لم يكن موجود
-                    if (!htmlContent.includes('fonts.googleapis.com')) {
-                        const googleFonts = '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">';
-                        htmlContent = htmlContent.replace('</head>', `${googleFonts}\n</head>`);
-                    }
-                } else {
-                    // إذا لم يكن هناك ملف HTML، إنشاء صفحة بسيطة
-                    htmlContent = createSimplePreview();
                 }
                 
-                // عرض المعاينة في الإطار
-                const iframe = document.getElementById('previewFrame');
-                iframe.srcdoc = htmlContent;
-                
-                // تحديث حجم الإطار حسب الجهاز المحدد
-                updateFrameSize();
-                
-                // إظهار الإطار
-                iframe.style.display = 'block';
-            }
-            
-            // إنشاء معاينة بسيطة إذا لم يكن هناك ملف HTML
-            function createSimplePreview() {
-                let htmlContent = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${previewSite.name}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .container {
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-        
-        p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .file-list {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: right;
-        }
-        
-        .file-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        
-        .file-icon {
-            width: 30px;
-            text-align: center;
-        }
-        
-        footer {
-            margin-top: 40px;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1><i class="fas fa-globe"></i> ${previewSite.name}</h1>
-        <p>هذا موقع تم إنشاؤه باستخدام محرر الأكواد المتطور</p>
-        
-        <div class="file-list">
-            <h3><i class="fas fa-folder-open"></i> ملفات الموقع:</h3>`;
-                
-                // إضافة قائمة الملفات
-                Object.keys(previewSite.files).forEach(fileName => {
-                    const fileType = previewSite.fileTypes[fileName] || 'unknown';
-                    const icon = getFileIcon(fileType);
-                    
-                    htmlContent += `
-            <div class="file-item">
-                <i class="${icon} file-icon"></i>
-                <span>${fileName}</span>
-                <small style="margin-right: auto; opacity: 0.7;">${fileType}</small>
-            </div>`;
-                });
-                
-                htmlContent += `
-        </div>
-        
-        <p>استخدم محرر الأكواد لإنشاء ملف index.html لرؤية المعاينة الكاملة</p>
-    </div>
-    
-    <footer>
-        <p>تم التطوير باستخدام محرر الأكواد المتطور - مطور بواسطة محمود أحمد سعيد</p>
-    </footer>
-</body>
-</html>`;
-                
-                return htmlContent;
-            }
-            
-            // الحصول على أيقونة الملف
-            function getFileIcon(fileType) {
-                const icons = {
-                    'html': 'fab fa-html5',
-                    'css': 'fab fa-css3-alt',
-                    'javascript': 'fab fa-js-square',
-                    'python': 'fab fa-python',
-                    'php': 'fab fa-php',
-                    'java': 'fab fa-java',
-                    'cpp': 'fas fa-file-code',
-                    'c': 'fas fa-file-code',
-                    'csharp': 'fas fa-file-code',
-                    'ruby': 'far fa-gem',
-                    'swift': 'fas fa-mobile-alt',
-                    'go': 'fas fa-code',
-                    'rust': 'fas fa-cog',
-                    'json': 'fas fa-code',
-                    'xml': 'fas fa-code',
-                    'sql': 'fas fa-database',
-                    'markdown': 'fas fa-file-alt',
-                    'text': 'fas fa-file-alt',
-                    'unknown': 'fas fa-file'
+                previewFrame.srcdoc = htmlContent;
+                previewFrame.onload = function() {
+                    loading.style.display = 'none';
+                    previewFrame.style.display = 'block';
                 };
-                
-                return icons[fileType] || icons.unknown;
             }
             
-            // وظيفة عرض رسالة عدم وجود معاينة
-            function showNoPreview() {
-                document.getElementById('loadingPreview').style.display = 'none';
-                document.getElementById('noPreview').style.display = 'block';
-                document.getElementById('previewFrame').style.display = 'none';
-            }
-            
-            // وظيفة تهيئة الأحداث
-            function setupEvents() {
-                // زر التحديث
-                document.getElementById('refreshBtn').addEventListener('click', function() {
-                    location.reload();
-                });
-                
-                // زر الإغلاق
-                document.getElementById('closeBtn').addEventListener('click', function() {
-                    window.close();
-                });
-                
-                // زر العودة للمحرر
-                document.getElementById('backToEditor').addEventListener('click', function() {
-                    if (window.opener) {
-                        window.close();
-                    } else {
-                        window.history.back();
-                    }
-                });
-                
-                // أزرار محاكاة الأجهزة
-                document.querySelectorAll('.device-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const device = this.dataset.device;
-                        
-                        // تحديث الأزرار النشطة
-                        document.querySelectorAll('.device-btn').forEach(b => {
-                            b.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                        
-                        // تحديث الجهاز الحالي
-                        currentDevice = device;
-                        
-                        // تحديث حجم الإطار
-                        updateFrameSize();
-                    });
-                });
-                
-                // تحديث حجم الإطار عند تغيير حجم النافذة
-                window.addEventListener('resize', updateFrameSize);
-                
-                // اختصارات لوحة المفاتيح
-                document.addEventListener('keydown', function(e) {
-                    // F5 لتحديث
-                    if (e.key === 'F5') {
-                        e.preventDefault();
-                        location.reload();
-                    }
-                    
-                    // Escape للإغلاق
-                    if (e.key === 'Escape') {
-                        window.close();
-                    }
-                    
-                    // Ctrl+R لتحديث
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-                        e.preventDefault();
-                        location.reload();
-                    }
-                });
-            }
-            
-            // تحديث حجم الإطار حسب الجهاز
-            function updateFrameSize() {
-                const iframe = document.getElementById('previewFrame');
-                const sizeDisplay = document.getElementById('previewSize');
-                
-                let width = '100%';
-                let height = '100%';
-                let sizeText = '';
-                
-                switch(currentDevice) {
-                    case 'desktop':
-                        width = '100%';
-                        height = '100%';
-                        sizeText = '100% (حجم كامل)';
-                        break;
-                        
-                    case 'tablet':
-                        width = '768px';
-                        height = '1024px';
-                        sizeText = 'تابلت (768×1024)';
-                        break;
-                        
-                    case 'mobile':
-                        width = '375px';
-                        height = '667px';
-                        sizeText = 'موبايل (375×667)';
-                        break;
+            function createSimplePreview(project) {
+                const name = project.name || 'مشروع غير مسمى';
+                let filesList = '';
+                if (project.files) {
+                    filesList = Object.keys(project.files).map(fn => 
+                        `<div class="file-item"><i class="fas fa-file-code"></i> ${fn}</div>`
+                    ).join('');
                 }
-                
-                iframe.style.width = width;
-                iframe.style.height = height;
-                iframe.style.margin = '0 auto';
-                iframe.style.display = 'block';
-                
-                // مركزة الإطار
-                if (currentDevice !== 'desktop') {
-                    iframe.style.border = '1px solid #e2e8f0';
-                    iframe.style.borderRadius = '20px';
-                    iframe.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.1)';
-                } else {
-                    iframe.style.border = 'none';
-                    iframe.style.borderRadius = '0';
-                    iframe.style.boxShadow = 'none';
-                }
-                
-                sizeDisplay.textContent = sizeText;
+                return `<!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${name}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+                <style>
+                    * { margin:0; padding:0; box-sizing:border-box; }
+                    body { font-family:'Tajawal',sans-serif; background: linear-gradient(135deg,#4361ee,#7209b7); color:white; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+                    .card { background:rgba(255,255,255,0.1); backdrop-filter:blur(10px); border-radius:20px; padding:40px; max-width:800px; text-align:center; }
+                    h1 { margin-bottom:20px; }
+                    .file-list { margin-top:30px; text-align:right; background:rgba(0,0,0,0.2); border-radius:10px; padding:20px; }
+                    .file-item { padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; gap:10px; }
+                    footer { margin-top:40px; opacity:0.8; font-size:0.9rem; }
+                </style>
+                </head>
+                <body>
+                    <div class="card">
+                        <h1><i class="fas fa-code"></i> ${name}</h1>
+                        <p>تم إنشاء هذا المشروع باستخدام محرر الأكواد الذكي</p>
+                        <div class="file-list"><h3>ملفات المشروع:</h3>${filesList || '<p>لا توجد ملفات</p>'}</div>
+                        <footer>© 2024 محرر الأكواد الذكي</footer>
+                    </div>
+                </body>
+                </html>`;
             }
+            
+            // أحداث الأزرار
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.device-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const device = this.dataset.device;
+                    currentDevice = device;
+                    previewFrame.className = `preview-frame ${device}`;
+                    const sizeText = device === 'desktop' ? '100% (كامل)' : (device === 'tablet' ? 'تابلت (768×1024)' : 'موبايل (375×667)');
+                    document.getElementById('previewSize').textContent = sizeText;
+                });
+            });
+            
+            document.getElementById('refreshBtn').addEventListener('click', () => renderPreview());
+            document.getElementById('closeBtn').addEventListener('click', () => window.close());
+            
+            // تحديث حجم الإطار عند تغيير حجم النافذة
+            window.addEventListener('resize', function() {
+                if (currentDevice === 'desktop') {
+                    previewFrame.style.maxWidth = '100%';
+                    previewFrame.style.height = '100%';
+                }
+            });
+            
+            // اختصارات
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) { e.preventDefault(); renderPreview(); }
+                if (e.key === 'Escape') window.close();
+            });
         });
     </script>
+    
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>
