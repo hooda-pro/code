@@ -32,6 +32,7 @@
         <!-- Header -->
         <header class="editor-header">
             <div class="header-left">
+                <!-- زر القائمة الجانبية (يظهر فقط على الجوال) -->
                 <button class="btn btn-icon mobile-menu-toggle" id="mobileMenuToggle" title="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
@@ -56,32 +57,36 @@
             
             <div class="header-right">
                 <div class="editor-controls">
-                    <button class="btn btn-icon" id="themeToggle" title="تبديل الوضع المظلم">
+                    <!-- زر تبديل الوضع (يظهر فقط على سطح المكتب) -->
+                    <button class="btn btn-icon desktop-only" id="themeToggle" title="تبديل الوضع المظلم">
                         <i class="fas fa-moon"></i>
                     </button>
                     
-                    <!-- زر المعاينة – يفتح صفحة منفصلة -->
-                    <button class="btn btn-primary" id="previewBtn">
+                    <!-- زر المعاينة (يظهر فقط على سطح المكتب) -->
+                    <button class="btn btn-primary desktop-only" id="previewBtn">
                         <i class="fas fa-eye"></i>
                         <span class="btn-text">معاينة</span>
                     </button>
                     
-                    <button class="btn btn-success" id="saveBtn">
+                    <!-- زر الحفظ (يظهر فقط على سطح المكتب) -->
+                    <button class="btn btn-success desktop-only" id="saveBtn">
                         <i class="fas fa-save"></i>
                         <span class="btn-text">حفظ</span>
                     </button>
                     
+                    <!-- زر إضافة ملف (يظهر فقط على سطح المكتب) -->
                     <button class="btn btn-warning desktop-only" id="addFileBtn">
                         <i class="fas fa-plus"></i>
                         <span class="btn-text">ملف جديد</span>
                     </button>
                     
+                    <!-- زر التحميل (يظهر فقط على سطح المكتب) -->
                     <button class="btn btn-info desktop-only" id="downloadBtn">
                         <i class="fas fa-download"></i>
                         <span class="btn-text">تحميل</span>
                     </button>
                     
-                    <!-- قائمة المزيد للجوال -->
+                    <!-- قائمة المزيد للجوال (تظهر فقط على الشاشات الصغيرة) -->
                     <div class="mobile-more-menu">
                         <button class="btn btn-icon" id="mobileMoreBtn" title="المزيد">
                             <i class="fas fa-ellipsis-v"></i>
@@ -91,6 +96,7 @@
                             <button class="dropdown-item" id="mobileDownload"><i class="fas fa-download"></i> تحميل</button>
                             <button class="dropdown-item" id="mobileFormat"><i class="fas fa-indent"></i> تنسيق</button>
                             <button class="dropdown-item" id="mobileFullscreen"><i class="fas fa-expand"></i> ملء الشاشة</button>
+                            <button class="dropdown-item" id="mobileThemeToggle"><i class="fas fa-moon"></i> تبديل الوضع</button>
                         </div>
                     </div>
                 </div>
@@ -171,7 +177,8 @@
                             <textarea id="codeInput" placeholder="اكتب كودك هنا..."></textarea>
                             <div class="line-numbers" id="lineNumbers"></div>
                         </div>
-                        <div class="editor-footer">
+                        <!-- شريط الحالة (يظهر فقط على سطح المكتب) -->
+                        <div class="editor-footer desktop-only">
                             <div class="editor-stats">
                                 <span id="lineCount">0 أسطر</span>
                                 <span id="charCount">0 أحرف</span>
@@ -227,8 +234,17 @@
                             <option value="javascript">JavaScript</option>
                             <option value="python">Python</option>
                             <option value="php">PHP</option>
+                            <option value="java">Java</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="swift">Swift</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="typescript">TypeScript</option>
                             <option value="json">JSON</option>
                             <option value="xml">XML</option>
+                            <option value="sql">SQL</option>
                             <option value="markdown">Markdown</option>
                             <option value="text">نص عادي</option>
                         </select>
