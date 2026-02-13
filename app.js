@@ -1,415 +1,361 @@
-// ===== تطبيق محرر الأكواد الذكي =====
-// تم التطوير بواسطة: محمود احمد سعيد
-// تاريخ الإصدار: 2024
-// جميع الحقوق محفوظة
+// ===== محرر الأكواد الذكي – الصفحة الرئيسية v3.0 =====
+// مطور الواجهات: محمود أحمد سعيد
+// جميع الحقوق محفوظة © 2026
+
+'use strict';
+
+// الحالة العامة للتطبيق
+const AppState = {
+  projects: [],
+  currentSection: 'home',
+  isDark: true,
+};
 
 // تهيئة التطبيق عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 محرر الأكواد الذكي - بدء التحميل');
-    
-    window.appState = {
-        currentSection: 'home',
-        projects: [],
-        currentProject: null,
-        isInitialized: false
-    };
-    
-    setTimeout(initApp, 1000);
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 منصة محرر الأكواد – بدء التشغيل');
+  setTimeout(initApp, 800);
 });
 
 function initApp() {
-    const loadingScreen = document.getElementById('loadingScreen');
-    loadingScreen.style.opacity = '0';
-    setTimeout(() => {
-        loadingScreen.style.display = 'none';
-        document.getElementById('mainContainer').style.display = 'block';
-        initComponents();
-        loadProjects();
-        showToast('مرحباً بك في محرر الأكواد الذكي!', 'success');
-    }, 500);
+  hideLoading();
+  initTheme();
+  initEvents();
+  loadProjects();
+  showToast('مرحباً بك في محرر الأكواد الذكي', 'success');
+  window.AppState = AppState;
 }
 
-function initComponents() {
-    initNavigation();
-    initButtons();
-    initModals();
-    initForms();
-    initSearch();
-    initKeyboardShortcuts();
-    detectDevice();
-    window.appState.isInitialized = true;
-    console.log('✅ التطبيق جاهز للاستخدام');
+function hideLoading() {
+  const loader = document.getElementById('loadingScreen');
+  loader.style.opacity = '0';
+  setTimeout(() => {
+    loader.style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }, 500);
 }
 
-// ===== التنقل =====
-function initNavigation() {
-    const navToggle = document.getElementById('navToggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    navToggle.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        this.innerHTML = navLinks.classList.contains('active') ? 
-            '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+// ===== إدارة المظهر =====
+function initTheme() {
+  const saved = localStorage.getItem('codeEditorTheme');
+  if (saved === 'light-mode') {
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('light-mode');
+    AppState.isDark = false;
+    const icon = document.querySelector('.theme-toggle i');
+    if (icon) icon.className = 'fas fa-sun';
+  }
+}
+
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.querySelector('.theme-toggle i');
+  if (body.classList.contains('dark-mode')) {
+    body.classList.replace('dark-mode', 'light-mode');
+    icon.className = 'fas fa-sun';
+    localStorage.setItem('codeEditorTheme', 'light-mode');
+    AppState.isDark = false;
+  } else {
+    body.classList.replace('light-mode', 'dark-mode');
+    icon.className = 'fas fa-moon';
+    localStorage.setItem('codeEditorTheme', 'dark-mode');
+    AppState.isDark = true;
+  }
+  showToast(`الوضع ${AppState.isDark ? 'الداكن' : 'الفاتح'}`, 'info');
+}
+
+// ===== ربط الأحداث =====
+function initEvents() {
+  // زر القائمة للجوال
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.querySelector('.nav-links');
+  menuBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+  });
+
+  // التنقل بين الأقسام
+  document.querySelectorAll('.nav-link[data-section], .footer-links a[data-section]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const section = link.dataset.section;
+      switchSection(section);
+      if (window.innerWidth <= 768) navLinks.classList.remove('active');
     });
-    
-    const navItems = document.querySelectorAll('.nav-link, .footer-links a');
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            if (window.innerWidth <= 768) {
-                navLinks.classList.remove('active');
-                navToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-            const section = this.dataset.section;
-            if (section) switchSection(section);
-            else if (this.id === 'aboutBtn') showModal('aboutModal');
-        });
+  });
+
+  // زر المطور
+  document.getElementById('aboutBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    showModal('aboutModal');
+  });
+
+  // إغلاق القائمة عند النقر خارجها
+  document.addEventListener('click', (e) => {
+    if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+      navLinks.classList.remove('active');
+    }
+  });
+
+  // تبديل المظهر
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  // أزرار المشاريع
+  document.getElementById('startProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
+  document.getElementById('viewProjectsBtn').addEventListener('click', () => switchSection('projects'));
+  document.getElementById('newProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
+  document.getElementById('createFirstProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
+  document.getElementById('createProjectBtn').addEventListener('click', createNewProject);
+
+  // إغلاق المودالات
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', hideAllModals);
+  });
+  document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) hideAllModals();
     });
-    
-    document.addEventListener('click', function(e) {
-        if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-            navLinks.classList.remove('active');
-            navToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        }
+  });
+
+  // البحث
+  const searchInput = document.getElementById('projectSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      filterProjects(this.value);
     });
+  }
+
+  // اختصارات لوحة المفاتيح
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+      e.preventDefault();
+      showModal('newProjectModal');
+    }
+    if (e.key === 'Escape') {
+      hideAllModals();
+      if (AppState.currentSection !== 'home') switchSection('home');
+    }
+  });
 }
 
 function switchSection(sectionId) {
-    ['homeSection', 'projectsSection', 'featuresSection'].forEach(id => {
-        const sec = document.getElementById(id);
-        if (sec) sec.style.display = 'none';
-    });
-    document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-    
-    const target = document.getElementById(sectionId + 'Section');
-    if (target) {
-        target.style.display = 'block';
-        const activeNav = document.querySelector(`[data-section="${sectionId}"]`);
-        if (activeNav) activeNav.classList.add('active');
-        window.appState.currentSection = sectionId;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        if (sectionId === 'projects') loadProjects();
-    }
-}
+  // إخفاء جميع الأقسام
+  ['home', 'projects', 'features'].forEach(id => {
+    const sec = document.getElementById(`${id}Section`);
+    if (sec) sec.classList.remove('active');
+  });
+  // إظهار القسم المطلوب
+  const target = document.getElementById(`${sectionId}Section`);
+  if (target) {
+    target.classList.add('active');
+    AppState.currentSection = sectionId;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  // تحديث الروابط النشطة
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  const activeLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+  if (activeLink) activeLink.classList.add('active');
 
-// ===== الأزرار =====
-function initButtons() {
-    document.getElementById('startProjectBtn')?.addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('viewProjectsBtn')?.addEventListener('click', () => switchSection('projects'));
-    document.getElementById('newProjectBtn')?.addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('createFirstProjectBtn')?.addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('createProjectBtn')?.addEventListener('click', createNewProject);
-}
-
-// ===== المودالات =====
-function initModals() {
-    document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', hideAllModals);
-    });
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) hideAllModals();
-        });
-    });
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') hideAllModals();
-    });
-}
-
-function showModal(modalId) {
-    hideAllModals();
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function hideAllModals() {
-    document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
-    document.body.style.overflow = 'auto';
-}
-
-// ===== النماذج =====
-function initForms() {
-    const projectForm = document.getElementById('projectForm');
-    if (projectForm) projectForm.addEventListener('submit', e => { e.preventDefault(); createNewProject(); });
-}
-
-// ===== البحث =====
-function initSearch() {
-    const searchInput = document.getElementById('projectSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() { filterProjects(this.value); });
-    }
-}
-
-// ===== اختصارات لوحة المفاتيح =====
-function initKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'n') { e.preventDefault(); showModal('newProjectModal'); }
-        if ((e.ctrlKey || e.metaKey) && e.key === '/') { 
-            e.preventDefault(); 
-            const search = document.getElementById('projectSearch');
-            if (search) { search.focus(); search.select(); }
-        }
-        if (e.key === 'Escape' && window.appState.currentSection !== 'home') switchSection('home');
-    });
-}
-
-// ===== كشف الجهاز =====
-function detectDevice() {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
-    if (isMobile) document.body.classList.add('mobile-device');
-    if (isTablet) document.body.classList.add('tablet-device');
-    if (!isMobile && !isTablet) document.body.classList.add('desktop-device');
-    if (window.innerWidth < 768) document.body.classList.add('small-screen');
-    else document.body.classList.remove('small-screen');
-    window.addEventListener('resize', () => {
-        if (window.innerWidth < 768) document.body.classList.add('small-screen');
-        else document.body.classList.remove('small-screen');
-    });
+  if (sectionId === 'projects') loadProjects();
 }
 
 // ===== إدارة المشاريع =====
 function loadProjects() {
-    try {
-        const saved = localStorage.getItem('codeEditorProjects');
-        window.appState.projects = saved ? JSON.parse(saved) : [];
-        console.log(`تم تحميل ${window.appState.projects.length} مشروع`);
-    } catch (e) {
-        console.error('خطأ في تحميل المشاريع:', e);
-        window.appState.projects = [];
-        showToast('حدث خطأ في تحميل المشاريع', 'error');
-    }
+  try {
+    const saved = localStorage.getItem('codeEditorProjects');
+    AppState.projects = saved ? JSON.parse(saved) : [];
     renderProjects();
+  } catch (e) {
+    console.error(e);
+    showToast('فشل تحميل المشاريع', 'error');
+  }
 }
 
 function renderProjects() {
-    const grid = document.getElementById('projectsGrid');
-    const empty = document.getElementById('emptyProjects');
-    if (!grid || !empty) return;
+  const grid = document.getElementById('projectsGrid');
+  const empty = document.getElementById('emptyProjects');
+  if (!grid || !empty) return;
 
-    if (window.appState.projects.length > 0) {
-        empty.style.display = 'none';
-        grid.innerHTML = '';
-        window.appState.projects.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-        window.appState.projects.forEach((project, idx) => {
-            const card = createProjectCard(project, idx);
-            grid.appendChild(card);
-        });
-    } else {
-        empty.style.display = 'block';
-        grid.innerHTML = '';
-    }
+  if (AppState.projects.length > 0) {
+    empty.style.display = 'none';
+    grid.innerHTML = '';
+    AppState.projects.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    AppState.projects.forEach((project, idx) => {
+      grid.appendChild(createProjectCard(project, idx));
+    });
+  } else {
+    empty.style.display = 'block';
+    grid.innerHTML = '';
+  }
 }
 
 function createProjectCard(project, index) {
-    const card = document.createElement('div');
-    card.className = 'project-card';
-    card.dataset.index = index;
-    
-    const created = new Date(project.createdAt).toLocaleDateString('ar-EG', { year:'numeric', month:'long', day:'numeric' });
-    const updated = new Date(project.updatedAt).toLocaleDateString('ar-EG', { month:'short', day:'numeric' });
-    const fileCount = project.files ? Object.keys(project.files).length : 0;
-    
-    card.innerHTML = `
-        <div class="project-header">
-            <div class="project-icon"><i class="fas fa-code"></i></div>
-            <div class="project-title">
-                <h3>${project.name}</h3>
-                <div class="project-date">تم الإنشاء: ${created}</div>
-            </div>
-        </div>
-        <p style="color: var(--light-secondary); margin-bottom: 15px; flex: 1;">${project.description || 'لا يوجد وصف'}</p>
-        <div class="project-stats">
-            <span><i class="fas fa-file"></i> ${fileCount} ملف</span>
-            <span><i class="fas fa-clock"></i> تم التعديل: ${updated}</span>
-        </div>
-        <div class="project-actions">
-            <button class="btn btn-primary btn-sm open-project" data-index="${index}"><i class="fas fa-edit"></i> فتح</button>
-            <button class="btn btn-secondary btn-sm download-project" data-index="${index}"><i class="fas fa-download"></i> تحميل</button>
-            <button class="btn btn-danger btn-sm delete-project" data-index="${index}"><i class="fas fa-trash"></i></button>
-        </div>
-    `;
-    
-    card.querySelector('.open-project').addEventListener('click', e => { e.stopPropagation(); openProject(index); });
-    card.querySelector('.download-project').addEventListener('click', e => { e.stopPropagation(); prepareDownload(index); });
-    card.querySelector('.delete-project').addEventListener('click', e => { e.stopPropagation(); deleteProject(index); });
-    card.addEventListener('click', e => { if (!e.target.closest('.project-actions')) openProject(index); });
-    return card;
-}
+  const card = document.createElement('div');
+  card.className = 'project-card';
+  card.dataset.index = index;
+  const created = new Date(project.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+  const updated = new Date(project.updatedAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
+  const fileCount = project.files ? Object.keys(project.files).length : 0;
 
-function createNewProject() {
-    const nameInput = document.getElementById('projectName');
-    const typeSelect = document.getElementById('projectType');
-    const descText = document.getElementById('projectDescription');
-    const projectName = nameInput.value.trim();
-    if (!projectName) {
-        showToast('يرجى إدخال اسم المشروع', 'error');
-        nameInput.focus();
-        return;
-    }
-    const existing = window.appState.projects.find(p => p.name.toLowerCase() === projectName.toLowerCase());
-    if (existing) {
-        if (confirm(`يوجد مشروع باسم "${projectName}" بالفعل. هل تريد فتحه؟`)) {
-            openProject(window.appState.projects.indexOf(existing));
-        }
-        hideAllModals();
-        return;
-    }
-    
-    const newProject = {
-        id: generateId(),
-        name: projectName,
-        type: typeSelect.value,
-        description: descText.value.trim(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        files: getDefaultFiles(projectName, typeSelect.value),
-        fileTypes: { 'index.html':'html', 'style.css':'css', 'script.js':'javascript' }
-    };
-    
-    window.appState.projects.unshift(newProject);
-    saveProjects();
-    hideAllModals();
-    nameInput.value = '';
-    descText.value = '';
-    showToast(`تم إنشاء المشروع "${projectName}" بنجاح`, 'success');
-    openProject(0);
+  card.innerHTML = `
+    <div class="project-header">
+      <div class="project-icon"><i class="fas fa-code"></i></div>
+      <div class="project-title">
+        <h3>${escapeHTML(project.name)}</h3>
+        <div class="project-date">${created}</div>
+      </div>
+    </div>
+    <p style="opacity:0.8; flex:1;">${escapeHTML(project.description || 'بدون وصف')}</p>
+    <div class="project-stats">
+      <span><i class="fas fa-file"></i> ${fileCount} ملف</span>
+      <span><i class="fas fa-clock"></i> ${updated}</span>
+    </div>
+    <div class="project-actions">
+      <button class="btn btn-primary btn-sm open-project"><i class="fas fa-edit"></i> فتح</button>
+      <button class="btn btn-outline btn-sm download-project"><i class="fas fa-download"></i> تحميل</button>
+      <button class="btn btn-danger btn-sm delete-project"><i class="fas fa-trash"></i></button>
+    </div>
+  `;
+
+  const openBtn = card.querySelector('.open-project');
+  const downloadBtn = card.querySelector('.download-project');
+  const deleteBtn = card.querySelector('.delete-project');
+
+  openBtn.addEventListener('click', (e) => { e.stopPropagation(); openProject(index); });
+  downloadBtn.addEventListener('click', (e) => { e.stopPropagation(); prepareDownload(index); });
+  deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteProject(index); });
+  card.addEventListener('click', () => openProject(index));
+
+  return card;
 }
 
 function openProject(index) {
-    if (window.appState.projects[index]) {
-        window.appState.currentProject = window.appState.projects[index];
-        localStorage.setItem('currentProject', JSON.stringify(window.appState.currentProject));
-        window.location.href = 'editor.html';
-    }
-}
-
-function prepareDownload(index) {
-    if (window.appState.projects[index]) {
-        downloadProject(window.appState.projects[index]);
-    }
-}
-
-function downloadProject(project) {
-    if (typeof JSZip !== 'undefined') {
-        createZipFile(project);
-    } else {
-        showToast('جاري تحميل مكتبة الضغط...', 'warning');
-        setTimeout(() => {
-            if (typeof JSZip !== 'undefined') createZipFile(project);
-            else showToast('تعذر تحميل مكتبة الضغط', 'error');
-        }, 1000);
-    }
-}
-
-function createZipFile(project) {
-    const zip = new JSZip();
-    Object.keys(project.files).forEach(fn => zip.file(fn, project.files[fn]));
-    zip.file("project-info.json", JSON.stringify({
-        projectName: project.name, projectType: project.type, description: project.description,
-        created: project.createdAt, modified: project.updatedAt,
-        files: Object.keys(project.files), developer: "محمود احمد سعيد"
-    }, null, 2));
-    zip.generateAsync({ type: "blob" })
-        .then(content => {
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(content);
-            link.download = `${project.name.replace(/[^a-z0-9\u0600-\u06FF]/gi, '_')}_${Date.now()}.zip`;
-            link.click();
-            setTimeout(() => URL.revokeObjectURL(link.href), 100);
-            showToast('تم تحميل المشروع بنجاح', 'success');
-        })
-        .catch(err => { console.error(err); showToast('حدث خطأ في التحميل', 'error'); });
+  if (AppState.projects[index]) {
+    localStorage.setItem('currentProject', JSON.stringify(AppState.projects[index]));
+    window.location.href = 'editor.html';
+  }
 }
 
 function deleteProject(index) {
-    if (window.appState.projects[index]) {
-        const name = window.appState.projects[index].name;
-        if (confirm(`هل تريد حذف المشروع "${name}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
-            window.appState.projects.splice(index, 1);
-            saveProjects();
-            renderProjects();
-            showToast(`تم حذف المشروع "${name}"`, 'success');
-        }
-    }
+  const project = AppState.projects[index];
+  if (!project) return;
+  if (confirm(`هل أنت متأكد من حذف "${project.name}"؟`)) {
+    AppState.projects.splice(index, 1);
+    saveProjects();
+    renderProjects();
+    showToast(`تم حذف "${project.name}"`, 'success');
+  }
 }
 
-function filterProjects(searchTerm) {
-    const grid = document.getElementById('projectsGrid');
-    if (!grid) return;
-    const term = searchTerm.toLowerCase();
-    const filtered = window.appState.projects.filter(p =>
-        p.name.toLowerCase().includes(term) ||
-        (p.description && p.description.toLowerCase().includes(term)) ||
-        p.type.toLowerCase().includes(term)
-    );
-    if (filtered.length > 0) {
-        grid.innerHTML = '';
-        filtered.forEach((p, i) => {
-            const orig = window.appState.projects.indexOf(p);
-            grid.appendChild(createProjectCard(p, orig));
-        });
-    } else {
-        grid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
-            <div class="empty-icon"><i class="fas fa-search"></i></div>
-            <h3>لا توجد نتائج</h3><p>لم يتم العثور على مشاريع تطابق "${searchTerm}"</p>
-        </div>`;
+function prepareDownload(index) {
+  const project = AppState.projects[index];
+  if (project) downloadProject(project);
+}
+
+function downloadProject(project) {
+  if (typeof JSZip === 'undefined') {
+    showToast('جار تحميل مكتبة الضغط...', 'warning');
+    setTimeout(() => {
+      if (typeof JSZip !== 'undefined') createZip(project);
+      else showToast('تعذر تحميل المكتبة', 'error');
+    }, 1000);
+    return;
+  }
+  createZip(project);
+}
+
+function createZip(project) {
+  const zip = new JSZip();
+  Object.keys(project.files).forEach(fname => zip.file(fname, project.files[fname]));
+  zip.file('project-info.json', JSON.stringify({
+    name: project.name,
+    type: project.type,
+    description: project.description,
+    created: project.createdAt,
+    modified: project.updatedAt,
+    files: Object.keys(project.files)
+  }, null, 2));
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(content);
+    link.download = `${project.name.replace(/[^a-z0-9\u0600-\u06FF]/gi, '_')}.zip`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast('تم تحميل المشروع', 'success');
+  }).catch(() => showToast('فشل التحميل', 'error'));
+}
+
+function createNewProject() {
+  const nameInput = document.getElementById('projectName');
+  const typeSelect = document.getElementById('projectType');
+  const descInput = document.getElementById('projectDescription');
+  const name = nameInput.value.trim();
+  if (!name) {
+    showToast('أدخل اسم المشروع', 'error');
+    nameInput.focus();
+    return;
+  }
+
+  const exists = AppState.projects.find(p => p.name.toLowerCase() === name.toLowerCase());
+  if (exists) {
+    if (confirm(`يوجد مشروع باسم "${name}". هل تريد فتحه؟`)) {
+      openProject(AppState.projects.indexOf(exists));
     }
+    hideAllModals();
+    return;
+  }
+
+  const newProject = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+    name,
+    type: typeSelect.value,
+    description: descInput.value.trim(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    files: getDefaultFiles(name, typeSelect.value),
+    fileTypes: { 'index.html': 'html', 'style.css': 'css', 'script.js': 'javascript' }
+  };
+
+  AppState.projects.unshift(newProject);
+  saveProjects();
+  hideAllModals();
+  nameInput.value = '';
+  descInput.value = '';
+  showToast(`تم إنشاء "${name}"`, 'success');
+  openProject(0);
 }
 
 function saveProjects() {
-    try {
-        localStorage.setItem('codeEditorProjects', JSON.stringify(window.appState.projects));
-    } catch (e) {
-        console.error('خطأ في حفظ المشاريع:', e);
-        showToast('حدث خطأ في حفظ المشاريع', 'error');
-    }
+  localStorage.setItem('codeEditorProjects', JSON.stringify(AppState.projects));
 }
 
-// ===== وظائف مساعدة =====
-function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+function filterProjects(query) {
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+  const q = query.toLowerCase();
+  const filtered = AppState.projects.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    (p.description && p.description.toLowerCase().includes(q))
+  );
+  if (filtered.length > 0) {
+    grid.innerHTML = '';
+    filtered.forEach((p, i) => {
+      const originalIndex = AppState.projects.indexOf(p);
+      grid.appendChild(createProjectCard(p, originalIndex));
+    });
+  } else {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-search"></i><h3>لا توجد نتائج</h3><p>لا يوجد مشروع يطابق "${query}"</p></div>`;
+  }
 }
 
-function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    const icons = { success:'fas fa-check-circle', error:'fas fa-exclamation-circle', warning:'fas fa-exclamation-triangle', info:'fas fa-info-circle' };
-    toast.innerHTML = `<i class="${icons[type] || icons.info}"></i>
-        <div class="toast-content">${message}</div>
-        <button class="toast-close">&times;</button>`;
-    container.appendChild(toast);
-    toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.style.animation = 'toastSlideIn 0.3s ease reverse forwards';
-            setTimeout(() => toast.remove(), 300);
-        }
-    }, 5000);
-}
-
-// ===== الملفات الافتراضية =====
+// ===== الملفات الافتراضية للمشروع الجديد =====
 function getDefaultFiles(projectName, projectType) {
-    return {
-        'index.html': getDefaultHTML(projectName, projectType),
-        'style.css': getDefaultCSS(projectName, projectType),
-        'script.js': getDefaultJS(projectName, projectType)
-    };
-}
-
-function getDefaultHTML(name, type) {
-    return `<!DOCTYPE html>
+  return {
+    'index.html': `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${name}</title>
+    <title>${projectName}</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -417,7 +363,7 @@ function getDefaultHTML(name, type) {
 <body>
     <div class="container">
         <header>
-            <h1>${name}</h1>
+            <h1>${projectName}</h1>
             <p>مرحباً بك في موقعك الجديد</p>
         </header>
         <main>
@@ -427,16 +373,13 @@ function getDefaultHTML(name, type) {
             </div>
         </main>
         <footer>
-            <p>© 2024 ${name}</p>
+            <p>© 2026 ${projectName}</p>
         </footer>
     </div>
     <script src="script.js"></script>
 </body>
-</html>`;
-}
-
-function getDefaultCSS(name, type) {
-    return `/* أنماط ${name} */
+</html>`,
+    'style.css': `/* أنماط ${projectName} */
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
     font-family: 'Tajawal', sans-serif;
@@ -449,20 +392,63 @@ body {
 header { text-align: center; padding: 3rem 2rem; background: rgba(255,255,255,0.1); border-radius: 20px; margin-bottom: 2rem; }
 h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .content { background: white; color: #333; padding: 2rem; border-radius: 15px; }
-footer { text-align: center; padding: 2rem; margin-top: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px; }`;
-}
-
-function getDefaultJS(name, type) {
-    return `// JavaScript لـ ${name}
-console.log('مرحباً بك في ${name}');
+footer { text-align: center; padding: 2rem; margin-top: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px; }`,
+    'script.js': `// JavaScript لـ ${projectName}
+console.log('مرحباً بك في ${projectName}');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('تم تحميل الصفحة');
-});`;
+});`
+  };
 }
 
-// ===== تهيئة إضافية =====
-console.log('%cمحرر الأكواد الذكي v2.0', 'font-size:16px; color:#4361ee; font-weight:bold;');
-console.log('%cتم التطوير بواسطة: محمود احمد سعيد', 'color:#7209b7;');
+// ===== إدارة المودالات =====
+function showModal(id) {
+  hideAllModals();
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
 
-// كشف الجهاز عند التحميل
-detectDevice();
+function hideAllModals() {
+  document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+  document.body.style.overflow = 'auto';
+}
+
+// ===== رسائل التوست =====
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+    <div class="toast-content">${message}</div>
+    <button class="toast-close">&times;</button>
+  `;
+  container.appendChild(toast);
+  toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.style.animation = 'toastSlide 0.3s ease reverse forwards';
+      setTimeout(() => toast.remove(), 300);
+    }
+  }, 5000);
+}
+
+// ===== دوال مساعدة =====
+function escapeHTML(str) {
+  return String(str).replace(/[&<>"]/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  });
+}
+
+// كشف جهاز اللمس
+function detectTouch() {
+  if ('ontouchstart' in window) document.body.classList.add('touch-device');
+}
+detectTouch();
+
+// التصدير للاستخدام العام
+window.showToast = showToast;
