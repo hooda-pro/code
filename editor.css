@@ -1,507 +1,374 @@
-/* ===== محرر الأكواد الذكي – وضع ملء الشاشة FULL HD v3.3 ===== */
-:root {
-  --editor-bg-dark: #0b0e14;
-  --editor-sidebar-dark: #151a22;
-  --editor-surface-dark: #1e2630;
-  --editor-border-dark: #2a323c;
-  --editor-bg-light: #ffffff;
-  --editor-sidebar-light: #f1f5f9;
-  --editor-surface-light: #e2e8f0;
-  --editor-border-light: #cbd5e1;
-}
-
-body.dark-mode .editor-app {
-  --editor-bg: var(--editor-bg-dark);
-  --editor-sidebar: var(--editor-sidebar-dark);
-  --editor-surface: var(--editor-surface-dark);
-  --editor-border: var(--editor-border-dark);
-}
-
-body.light-mode .editor-app {
-  --editor-bg: var(--editor-bg-light);
-  --editor-sidebar: var(--editor-sidebar-light);
-  --editor-surface: var(--editor-surface-light);
-  --editor-border: var(--editor-border-light);
-}
-
-/* ===== إعادة تعيين الارتفاع والهوامش –最关键 ===== */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden; /* منع التمرير العام */
-}
-
+/* ===== محرر الأكواد - تصميم خاص للموبايل ===== */
 .editor-app {
-  background: var(--editor-bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  font-family: 'Inter', 'Tajawal', sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
 }
 
-/* ===== رأس المحرر – مدمج ولا يضيع مساحة ===== */
+/* رأس المحرر */
 .editor-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 24px;
-  margin: 8px 16px 0 16px;
-  border-radius: 40px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  flex-shrink: 0; /* يمنع الانكماش */
-}
-
-.header-left,
-.header-center,
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.project-badge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.project-badge i {
-  font-size: 28px;
-  color: var(--primary);
-}
-.project-badge h1 {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0;
-}
-.project-status {
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.8;
-}
-.project-status i {
-  font-size: 8px;
-  color: var(--success);
-}
-
-/* ===== التخطيط الرئيسي – يأخذ كل المساحة المتبقية ===== */
-.editor-layout {
-  display: flex;
-  flex: 1;
-  min-height: 0; /* مهم جداً لـ flex */
-  padding: 8px 16px 16px 16px;
-  gap: 16px;
-  overflow: hidden;
-}
-
-/* ===== الشريط الجانبي – عرض ثابت ===== */
-.editor-sidebar {
-  width: 280px;
-  background: var(--editor-sidebar);
-  border-radius: 20px;
-  border: 1px solid var(--editor-border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* باقي أنماط الشريط الجانبي (اختصاراً للطول، هي نفسها تقريباً مع تحسينات طفيفة) */
-.sidebar-section {
-  padding: 20px;
-  border-bottom: 1px solid var(--editor-border);
-}
-.sidebar-section:last-child { border-bottom: none; }
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-weight: 700;
-  font-size: 14px;
-}
-.section-title i { color: var(--primary); }
-.section-title button { margin-right: auto; }
-
-.files-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 260px;
-  overflow-y: auto;
-}
-.file-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.file-item:hover { background: rgba(59,130,246,0.08); }
-.file-item.active {
-  background: rgba(59,130,246,0.15);
-  border: 1px solid var(--primary);
-}
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden;
-}
-.file-icon { color: var(--primary); width: 20px; }
-.file-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.file-unsaved { color: var(--warning); margin-right: 6px; font-size: 10px; }
-.file-actions { opacity: 0; transition: 0.2s; }
-.file-item:hover .file-actions { opacity: 1; }
-.file-action-btn {
-  background: none; border: none; color: var(--text); padding: 4px; border-radius: 6px; cursor: pointer;
-}
-.file-action-btn:hover { background: var(--surface); color: var(--danger); }
-
-.tools-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.tool-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  transition: 0.2s;
-}
-.tool-btn:hover {
-  border-color: var(--primary);
-  background: rgba(59,130,246,0.1);
-  transform: translateY(-2px);
-}
-
-.project-details {
-  font-size: 13px;
-  line-height: 1.8;
-}
-.project-detail {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.detail-label { opacity: 0.7; }
-.detail-value { font-weight: 600; color: var(--primary); }
-
-.sidebar-footer {
-  margin-top: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ===== منطقة المحرر – تأخذ كل المساحة المتبقية ===== */
-.editor-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0; /* مهم */
-  overflow: hidden;
-  border-radius: 20px;
-  background: var(--editor-bg);
-  border: 1px solid var(--editor-border);
-}
-
-.editor-tabs {
-  display: flex;
-  background: var(--editor-surface);
-  border-bottom: 1px solid var(--editor-border);
-  padding: 0 12px;
-  overflow-x: auto;
-  min-height: 48px;
-  flex-shrink: 0;
-}
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 20px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-bottom: none;
-  color: var(--text);
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  height: 48px;
-  transition: 0.2s;
-}
-.tab:hover { background: rgba(59,130,246,0.05); }
-.tab.active {
-  background: var(--editor-bg);
-  border-color: var(--editor-border);
-  border-bottom-color: var(--editor-bg);
-  color: var(--primary);
-  font-weight: 600;
-}
-.tab-close {
-  margin-right: 6px;
-  width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 50%;
-}
-.tab-close:hover { background: var(--surface); color: var(--danger); }
-.tab-unsaved { width: 6px; height: 6px; background: var(--warning); border-radius: 50%; margin-right: 6px; }
-
-/* ===== محرر الكود – عملاق! ===== */
-.code-editor {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0; /* مفتاح التمدد */
-  overflow: hidden;
-  background: var(--editor-bg);
-}
-
-.editor-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 20px;
-  background: var(--editor-surface);
-  border-bottom: 1px solid var(--editor-border);
-  flex-shrink: 0;
-}
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-.file-info i { color: var(--primary); font-size: 18px; }
-.toolbar-actions {
-  display: flex;
-  gap: 12px;
-}
-.language-select {
-  background: var(--editor-bg);
-  color: var(--text);
-  border: 1px solid var(--editor-border);
-  border-radius: 30px;
-  padding: 8px 20px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.code-area {
-  flex: 1;
-  display: flex;
-  position: relative;
-  min-height: 0; /* الأهم */
-  overflow: hidden;
-  background: var(--editor-bg);
-}
-
-#codeInput {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  background: var(--editor-bg);
-  color: var(--text);
-  border: none;
-  padding: 20px 20px 20px 70px;
-  font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 20px !important;  /* ضخم وواضح */
-  line-height: 1.7;
-  resize: none;
-  outline: none;
-  white-space: pre;
-  overflow: auto;
-  caret-color: var(--primary);
-}
-
-.line-numbers {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 60px;
-  background: var(--editor-sidebar);
-  color: var(--text);
-  opacity: 0.6;
-  font-family: 'Fira Code', monospace;
-  font-size: 16px;
-  line-height: 1.7;
-  text-align: center;
-  padding: 20px 0;
-  user-select: none;
-  pointer-events: none;
-  border-left: 1px solid var(--editor-border);
-}
-
-.line-number {
-  height: 34px; /* 20*1.7 = 34 */
-  line-height: 34px;
-  font-size: 16px;
-}
-
-.editor-statusbar {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 8px 20px;
-  background: var(--editor-surface);
-  border-top: 1px solid var(--editor-border);
-  font-size: 13px;
-  color: var(--text);
-  opacity: 0.8;
-  flex-shrink: 0;
-}
-.shortcuts { margin-right: auto; opacity: 0.6; font-size: 12px; }
-
-/* ===== الجوال – محرر كبير أيضاً ===== */
-@media (max-width: 768px) {
-  .desktop-only { display: none !important; }
-  .mobile-only { display: block !important; }
-  .mobile-menu-toggle { display: flex !important; }
-
-  .editor-header {
-    padding: 6px 16px;
-    margin: 8px 12px;
-  }
-  .project-badge h1 { max-width: 120px; font-size: 16px; }
-  .header-left .btn-text { display: none; }
-
-  .mobile-more { position: relative; }
-  .mobile-dropdown {
-    display: none;
-    position: absolute;
-    top: 45px;
-    left: 0;
-    background: var(--editor-sidebar);
-    border: 1px solid var(--editor-border);
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    z-index: 2000;
-    min-width: 200px;
-  }
-  .mobile-dropdown.show { display: block; }
-  .dropdown-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 18px;
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 15px;
-    text-align: right;
-  }
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    min-height: 3.5rem;
+}
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.header-center {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+}
+.project-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.project-badge i {
+    color: var(--primary);
+    font-size: 1.4rem;
+}
+.project-badge h1 {
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
 
-  .editor-sidebar {
+/* التخطيط الرئيسي */
+.editor-layout {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* الشريط الجانبي (للموبايل - مخفي افتراضياً) */
+.editor-sidebar {
     position: fixed;
-    right: -300px;
     top: 0;
-    bottom: 0;
+    right: -280px;
     width: 280px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
     z-index: 2500;
     transition: right 0.3s ease;
-    border-radius: 0 20px 20px 0;
-  }
-  .editor-sidebar.active { right: 0; }
-  .sidebar-header {
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+}
+.editor-sidebar.active {
+    right: 0;
+}
+.sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--editor-border);
-  }
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+.sidebar-header h3 { font-size: 1rem; }
+.sidebar-section {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+.files-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+}
+.file-item:active {
+    background: var(--surface-hover);
+}
+.file-item.active {
+    background: rgba(0,122,204,0.15);
+    border: 1px solid var(--primary);
+}
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    overflow: hidden;
+}
+.file-icon { width: 1.2rem; color: var(--primary); }
+.file-name {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.file-unsaved { color: var(--warning); margin-right: 0.25rem; font-size: 0.7rem; }
+.file-actions {
+    opacity: 0.5;
+}
+.file-item:active .file-actions { opacity: 1; }
+.file-action-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    padding: 0.25rem;
+    border-radius: 4px;
+}
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+}
 
-  .mobile-bottom-nav {
-    display: flex !important;
+/* منطقة المحرر */
+.editor-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg);
+}
+
+.editor-tabs {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    padding: 0 0.5rem;
+    min-height: 2.8rem;
+    flex-shrink: 0;
+}
+.tab {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    height: 2.8rem;
+    border-bottom: 2px solid transparent;
+}
+.tab:active {
+    background: var(--surface-hover);
+}
+.tab.active {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+    font-weight: 500;
+}
+.tab i { font-size: 1rem; }
+.tab-close {
+    margin-right: 0.25rem;
+    font-size: 1.2rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+.tab-close:active { background: var(--surface-hover); color: var(--danger); }
+.tab-unsaved {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--warning);
+    border-radius: 50%;
+    margin-right: 0.25rem;
+}
+
+/* محرر الكود */
+.code-editor {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    background: var(--bg);
+}
+.editor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+.language-select {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    min-height: 2.2rem;
+}
+
+.code-area {
+    flex: 1;
+    display: flex;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--bg);
+}
+#codeInput {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    border: none;
+    padding: 1rem 1rem 1rem 3rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+    white-space: pre;
+    overflow: auto;
+}
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2.5rem;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    text-align: center;
+    padding: 1rem 0;
+    user-select: none;
+    border-left: 1px solid var(--border);
+    pointer-events: none;
+}
+.line-number {
+    height: calc(1.6rem);
+    line-height: 1.6rem;
+    font-size: 0.8rem;
+}
+
+.editor-statusbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.4rem 1rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* الشريط السفلي للموبايل */
+.mobile-bottom-nav {
+    display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 64px;
-    background: var(--editor-sidebar);
-    border-top: 1px solid var(--editor-border);
+    height: 3.5rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
     z-index: 2000;
     backdrop-filter: blur(10px);
-  }
-  .bottom-nav-item {
+}
+.bottom-nav-item {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 0.2rem;
     background: transparent;
     border: none;
     color: var(--text);
-    font-size: 11px;
-  }
-  .bottom-nav-item i { font-size: 20px; }
+    font-size: 0.7rem;
+    padding: 0.25rem;
+}
+.bottom-nav-item:active {
+    background: var(--surface-hover);
+}
+.bottom-nav-item i { font-size: 1.3rem; }
 
-  .editor-layout {
-    padding: 8px 12px 72px; /* مساحة للشريط السفلي */
-  }
-
-  #codeInput {
-    font-size: 18px !important;
-    padding: 16px 16px 16px 55px;
-  }
-  .line-numbers {
-    width: 50px;
-    font-size: 15px;
-  }
-  .line-number {
-    height: 30.6px; /* 18*1.7 */
-    line-height: 30.6px;
-  }
+/* القائمة المنسدلة للجوال */
+.mobile-dropdown {
+    display: none;
+    position: absolute;
+    top: 3rem;
+    left: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 2600;
+    min-width: 180px;
+}
+.mobile-dropdown.show { display: block; }
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 0.95rem;
+    text-align: right;
+}
+.dropdown-item:active {
+    background: var(--surface-hover);
 }
 
-@media (max-width: 480px) {
-  #codeInput {
-    font-size: 17px !important;
-    padding: 14px 14px 14px 50px;
-  }
-  .line-numbers {
-    width: 45px;
-    font-size: 14px;
-  }
-  .line-number {
-    height: 28.9px;
-    line-height: 28.9px;
-  }
-}
-
-/* ===== إخفاء عناصر الجوال على سطح المكتب بشكل قاطع ===== */
+/* إخفاء العناصر حسب الشاشة */
 @media (min-width: 769px) {
-  .mobile-only,
-  .mobile-menu-toggle,
-  .mobile-bottom-nav,
-  .mobile-more,
-  .sidebar-header {
-    display: none !important;
-  }
+    .mobile-only, .mobile-menu-toggle, .mobile-bottom-nav, .mobile-more {
+        display: none !important;
+    }
 }
-
-/* ===== تحسين التمرير ===== */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: var(--editor-border); border-radius: 20px; }
-::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+@media (max-width: 768px) {
+    .desktop-only { display: none !important; }
+    .mobile-bottom-nav { display: flex; }
+    .editor-header { padding: 0.5rem 0.75rem; }
+    .project-badge h1 { max-width: 120px; }
+    .editor-layout { padding-bottom: 3.5rem; }
+    .editor-sidebar { width: 260px; }
+}
