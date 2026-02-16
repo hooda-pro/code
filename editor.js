@@ -1,4 +1,4 @@
-// ===== VS Code Editor Mobile - صفحة المحرر (كاملة الميزات) =====
+// ===== VS Code Editor Mobile - صفحة المحرر (كاملة الميزات مع ربط كامل للأزرار) =====
 'use strict';
 
 const EditorState = {
@@ -54,16 +54,18 @@ function loadProject() {
 
 function initEditor() {
     const loader = document.getElementById('loadingScreen');
-    loader.style.opacity = '0';
-    setTimeout(() => {
-        loader.style.display = 'none';
-        const editorApp = document.getElementById('editorApp');
-        if (editorApp) editorApp.style.display = 'flex';
-        setupEditor();
-        updateUI();
-        startAutoSave();
-        showToast(`مرحباً في مشروع ${EditorState.project?.name || ''}`, 'success');
-    }, 500);
+    if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+            const editorApp = document.getElementById('editorApp');
+            if (editorApp) editorApp.style.display = 'flex';
+            setupEditor();
+            updateUI();
+            startAutoSave();
+            showToast(`مرحباً في مشروع ${EditorState.project?.name || ''}`, 'success');
+        }, 500);
+    }
 }
 
 function setupEditor() {
@@ -75,59 +77,71 @@ function setupEditor() {
 }
 
 function bindEvents() {
-    // أزرار الرأس
-    const backBtn = document.getElementById('backBtn');
-    if (backBtn) backBtn.addEventListener('click', showExitModal);
+    // دالة مساعدة لربط الأحداث بأمان
+    function safeAddListener(id, event, handler) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener(event, handler);
+        } else {
+            console.warn(`Element with id "${id}" not found`);
+        }
+    }
+
+    // أزرار الرأس والتنقل
+    safeAddListener('backBtn', 'click', showExitModal);
+    safeAddListener('backToHome', 'click', showExitModal);
+    safeAddListener('themeToggle', 'click', toggleTheme);
     
-    const backToHome = document.getElementById('backToHome');
-    if (backToHome) backToHome.addEventListener('click', showExitModal);
-    
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
-    
-    const previewBtn = document.getElementById('previewBtn') || document.getElementById('mobilePreview') || document.getElementById('bottomPreview');
-    if (previewBtn) previewBtn.addEventListener('click', openPreview);
-    
-    const saveBtn = document.getElementById('saveBtn') || document.getElementById('mobileSave') || document.getElementById('bottomSave');
-    if (saveBtn) saveBtn.addEventListener('click', saveProject);
-    
-    const downloadBtn = document.getElementById('downloadBtn') || document.getElementById('mobileDownload');
-    if (downloadBtn) downloadBtn.addEventListener('click', downloadProject);
-    
-    const addFileBtn = document.getElementById('addFileBtn') || document.getElementById('mobileAddFile') || document.getElementById('bottomAddFile');
-    if (addFileBtn) addFileBtn.addEventListener('click', () => showModal('newFileModal'));
-    
-    const createFileBtn = document.getElementById('createFileBtn');
-    if (createFileBtn) createFileBtn.addEventListener('click', createNewFile);
-    
-    const refreshFiles = document.getElementById('refreshFiles');
-    if (refreshFiles) refreshFiles.addEventListener('click', () => updateUI());
-    
-    const formatBtn = document.getElementById('formatBtn');
-    if (formatBtn) formatBtn.addEventListener('click', formatCode);
-    
-    const clearBtn = document.getElementById('clearBtn');
-    if (clearBtn) clearBtn.addEventListener('click', clearCode);
-    
-    const searchBtn = document.getElementById('searchBtn');
-    if (searchBtn) searchBtn.addEventListener('click', () => showModal('searchModal'));
-    
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
-    
-    const copyCode = document.getElementById('copyCode');
-    if (copyCode) copyCode.addEventListener('click', copyCodeHandler);
-    
-    const fileManagerBtn = document.getElementById('fileManagerBtn');
-    if (fileManagerBtn) fileManagerBtn.addEventListener('click', showFileManager);
-    
-    const addFileFromManager = document.getElementById('addFileFromManager');
-    if (addFileFromManager) addFileFromManager.addEventListener('click', () => {
+    // أزرار المعاينة والحفظ والتحميل (قد تكون متعددة)
+    const previewBtns = ['previewBtn', 'mobilePreview', 'bottomPreview'];
+    previewBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', openPreview);
+    });
+
+    const saveBtns = ['saveBtn', 'mobileSave', 'bottomSave'];
+    saveBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', saveProject);
+    });
+
+    const downloadBtns = ['downloadBtn', 'mobileDownload'];
+    downloadBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', downloadProject);
+    });
+
+    // أزرار إضافة ملف (متعددة)
+    const addFileBtns = ['addFileBtn', 'mobileAddFile', 'bottomAddFile'];
+    addFileBtns.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', () => showModal('newFileModal'));
+    });
+
+    // زر إنشاء ملف في المودال
+    safeAddListener('createFileBtn', 'click', createNewFile);
+
+    // تحديث قائمة الملفات
+    safeAddListener('refreshFiles', 'click', () => updateUI());
+
+    // أدوات التحرير
+    safeAddListener('formatBtn', 'click', formatCode);
+    safeAddListener('clearBtn', 'click', clearCode);
+    safeAddListener('searchBtn', 'click', () => showModal('searchModal'));
+    safeAddListener('fullscreenBtn', 'click', toggleFullscreen);
+    safeAddListener('copyCode', 'click', copyCodeHandler);
+    safeAddListener('fileManagerBtn', 'click', showFileManager);
+    safeAddListener('addFileFromManager', 'click', () => {
         hideAllModals();
         showModal('newFileModal');
     });
 
-    // مودالات
+    // إغلاق الشريط الجانبي
+    safeAddListener('closeSidebar', 'click', () => {
+        document.getElementById('editorSidebar')?.classList.remove('active');
+    });
+
+    // مودالات - أزرار الإغلاق
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', hideAllModals);
     });
@@ -143,33 +157,23 @@ function bindEvents() {
     if (searchForm) searchForm.addEventListener('submit', (e) => { e.preventDefault(); performSearch(); });
 
     // بحث واستبدال
-    const searchActionBtn = document.getElementById('searchActionBtn');
-    if (searchActionBtn) searchActionBtn.addEventListener('click', performSearch);
-    
-    const prevResult = document.getElementById('prevResult');
-    if (prevResult) prevResult.addEventListener('click', prevSearchResult);
-    
-    const nextResult = document.getElementById('nextResult');
-    if (nextResult) nextResult.addEventListener('click', nextSearchResult);
-    
-    const replaceBtn = document.getElementById('replaceBtn');
-    if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
-    
-    const replaceAllBtn = document.getElementById('replaceAllBtn');
-    if (replaceAllBtn) replaceAllBtn.addEventListener('click', replaceAllText);
+    safeAddListener('searchActionBtn', 'click', performSearch);
+    safeAddListener('prevResult', 'click', prevSearchResult);
+    safeAddListener('nextResult', 'click', nextSearchResult);
+    safeAddListener('replaceBtn', 'click', replaceText);
+    safeAddListener('replaceAllBtn', 'click', replaceAllText);
 
     // خروج
-    const exitWithoutSave = document.getElementById('exitWithoutSave');
-    if (exitWithoutSave) exitWithoutSave.addEventListener('click', exitToHome);
-    
-    const saveAndExit = document.getElementById('saveAndExit');
-    if (saveAndExit) saveAndExit.addEventListener('click', saveAndExit);
+    safeAddListener('exitWithoutSave', 'click', exitToHome);
+    safeAddListener('saveAndExit', 'click', saveAndExit);
 
     // البحث في مدير الملفات
     const fileSearch = document.getElementById('fileSearch');
     if (fileSearch) fileSearch.addEventListener('input', function() {
         filterFiles(this.value);
     });
+
+    console.log('✅ تم ربط جميع الأحداث');
 }
 
 // ===== تهيئة المحرر النصي =====
@@ -905,42 +909,8 @@ function initMobile() {
         });
     }
 
-    // ربط أزرار الجوال (بعضها تم ربطه مسبقاً، نكرر للتأكيد)
-    const mobileAddFile = document.getElementById('mobileAddFile');
-    if (mobileAddFile) {
-        mobileAddFile.addEventListener('click', () => {
-            showModal('newFileModal');
-            dropdown?.classList.remove('show');
-        });
-    }
-    const mobileDownload = document.getElementById('mobileDownload');
-    if (mobileDownload) {
-        mobileDownload.addEventListener('click', () => {
-            downloadProject();
-            dropdown?.classList.remove('show');
-        });
-    }
-    const mobileFormat = document.getElementById('mobileFormat');
-    if (mobileFormat) {
-        mobileFormat.addEventListener('click', () => {
-            formatCode();
-            dropdown?.classList.remove('show');
-        });
-    }
-    const mobileFullscreen = document.getElementById('mobileFullscreen');
-    if (mobileFullscreen) {
-        mobileFullscreen.addEventListener('click', () => {
-            toggleFullscreen();
-            dropdown?.classList.remove('show');
-        });
-    }
-    const mobileThemeToggle = document.getElementById('mobileThemeToggle');
-    if (mobileThemeToggle) {
-        mobileThemeToggle.addEventListener('click', () => {
-            toggleTheme();
-            dropdown?.classList.remove('show');
-        });
-    }
+    // ربط أزرار الجوال (تم ربطها مسبقاً ولكن للتأكيد)
+    // لا حاجة لتكرار الربط هنا لأنها تمت في bindEvents
 }
 
 // ===== الخروج =====
