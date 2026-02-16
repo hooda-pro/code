@@ -1,4 +1,4 @@
-/* ===== VS Code Editor Mobile - الأنماط العامة (محسّن للموبايل) ===== */
+/* ===== VS Code Editor Mobile - الأنماط العامة ===== */
 :root {
     --bg: #1e1e1e;
     --surface: #252526;
@@ -45,7 +45,7 @@ body {
     transition: background 0.2s, color 0.2s;
     min-height: 100vh;
     overflow-x: hidden;
-    font-size: 16px; /* أساسي لتحويل rem */
+    font-size: 16px;
 }
 
 /* تحسين شاشات اللمس */
@@ -134,7 +134,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     background: var(--surface-hover);
 }
 
-/* ===== القائمة الجانبية (Drawer) ===== */
+/* ===== القائمة الجانبية (للموبايل) ===== */
 .mobile-nav {
     position: fixed;
     top: 0;
@@ -316,7 +316,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     background: var(--surface);
     color: var(--text);
     border: 1px solid var(--border);
-    min-height: 3rem; /* حجم لمس مناسب */
+    min-height: 3rem;
 }
 .btn-primary {
     background: var(--primary);
@@ -341,6 +341,16 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     font-size: 0.9rem;
     min-height: 2.5rem;
 }
+.btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-block { width: 100%; }
 
 /* ===== شبكة المشاريع ===== */
 .projects-controls {
@@ -511,7 +521,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     50% { transform: scale(1.1); }
 }
 
-/* ===== المودالات ===== */
+/* ===== المودالات العامة ===== */
 .modal {
     position: fixed;
     inset: 0;
@@ -536,6 +546,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
 }
+.modal-lg .modal-content { max-width: 600px; }
 .modal-header {
     display: flex;
     justify-content: space-between;

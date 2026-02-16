@@ -341,7 +341,7 @@ function showToast(message, type = 'info') {
         <button class="toast-close">&times;</button>
     `;
     container.appendChild(toast);
-    toast.querySelector('.toast-close').addEventListener('click', () => toast.remove());
+    toast.querySelector('.toast-close')?.addEventListener('click', () => toast.remove());
     setTimeout(() => {
         if (toast.parentNode) {
             toast.style.animation = 'toastSlide 0.3s ease reverse forwards';

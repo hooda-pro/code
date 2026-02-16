@@ -29,11 +29,14 @@
     flex: 1;
     text-align: center;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 .project-badge {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.5rem;
 }
 .project-badge i {
@@ -46,8 +49,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 120px;
 }
+.project-status {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+.project-status i { font-size: 0.5rem; }
 
 /* التخطيط الرئيسي */
 .editor-layout {
@@ -95,8 +106,9 @@
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
 }
+.section-title button { margin-right: auto; }
 .files-list {
-    max-height: 300px;
+    max-height: 200px;
     overflow-y: auto;
 }
 .file-item {
@@ -140,9 +152,53 @@
     padding: 0.25rem;
     border-radius: 4px;
 }
+
+/* أدوات الشبكة */
+.tools-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.tool-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: var(--transition);
+}
+.tool-btn:active {
+    border-color: var(--primary);
+    background: var(--surface-hover);
+    transform: translateY(-2px);
+}
+.tool-btn i { color: var(--primary); }
+
+/* تفاصيل المشروع */
+.project-details {
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+.project-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+.detail-label { opacity: 0.7; }
+.detail-value { font-weight: 600; color: var(--primary); }
+
 .sidebar-footer {
     margin-top: auto;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 /* منطقة المحرر */
@@ -228,6 +284,10 @@
     gap: 0.5rem;
     font-size: 0.9rem;
 }
+.toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+}
 .language-select {
     background: var(--bg);
     color: var(--text);
@@ -296,6 +356,7 @@
     color: var(--text-muted);
     flex-shrink: 0;
 }
+.shortcuts { margin-right: auto; font-size: 0.7rem; }
 
 /* الشريط السفلي للموبايل */
 .mobile-bottom-nav {
@@ -358,6 +419,68 @@
     background: var(--surface-hover);
 }
 
+/* أنماط إضافية للمودالات في المحرر */
+.file-manager-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+.file-manager-header .search-wrapper {
+    flex: 1;
+}
+.file-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+.file-manager-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+.file-manager-item:last-child { border-bottom: none; }
+.file-manager-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.file-manager-info i { color: var(--primary); font-size: 1.2rem; }
+.file-manager-name { font-weight: 500; }
+.file-manager-size { font-size: 0.8rem; color: var(--text-muted); }
+.file-manager-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-results {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.search-result {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+}
+.search-result:active { background: var(--surface-hover); }
+.search-result-line {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.search-result-context {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+.search-result-count {
+    padding: 0.5rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
 /* إخفاء العناصر حسب الشاشة */
 @media (min-width: 769px) {
     .mobile-only, .mobile-menu-toggle, .mobile-bottom-nav, .mobile-more {
@@ -368,7 +491,8 @@
     .desktop-only { display: none !important; }
     .mobile-bottom-nav { display: flex; }
     .editor-header { padding: 0.5rem 0.75rem; }
-    .project-badge h1 { max-width: 120px; }
+    .project-badge h1 { max-width: 100px; }
     .editor-layout { padding-bottom: 3.5rem; }
     .editor-sidebar { width: 260px; }
+    .editor-statusbar .shortcuts { display: none; }
 }
