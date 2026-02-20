@@ -64,10 +64,10 @@ function initEvents() {
     const menuBtn = document.getElementById('mobileMenuBtn');
     const nav = document.getElementById('mobileNav');
     const closeNav = document.getElementById('closeNav');
-    menuBtn.addEventListener('click', () => nav.classList.add('active'));
-    closeNav.addEventListener('click', () => nav.classList.remove('active'));
+    if (menuBtn) menuBtn.addEventListener('click', () => nav.classList.add('active'));
+    if (closeNav) closeNav.addEventListener('click', () => nav.classList.remove('active'));
     document.addEventListener('click', (e) => {
-        if (!nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        if (nav && !nav.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
             nav.classList.remove('active');
         }
     });
@@ -83,11 +83,14 @@ function initEvents() {
     });
 
     // زر المطور
-    document.getElementById('aboutBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showModal('aboutModal');
-        nav.classList.remove('active');
-    });
+    const aboutBtn = document.getElementById('aboutBtn');
+    if (aboutBtn) {
+        aboutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal('aboutModal');
+            nav.classList.remove('active');
+        });
+    }
 
     // إغلاق المودالات
     document.querySelectorAll('.modal-close').forEach(btn => {
@@ -99,12 +102,23 @@ function initEvents() {
         });
     });
 
-    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-    document.getElementById('startProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('viewProjectsBtn').addEventListener('click', () => switchSection('projects'));
-    document.getElementById('newProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('createFirstProjectBtn').addEventListener('click', () => showModal('newProjectModal'));
-    document.getElementById('createProjectBtn').addEventListener('click', createNewProject);
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+
+    const startProjectBtn = document.getElementById('startProjectBtn');
+    if (startProjectBtn) startProjectBtn.addEventListener('click', () => showModal('newProjectModal'));
+
+    const viewProjectsBtn = document.getElementById('viewProjectsBtn');
+    if (viewProjectsBtn) viewProjectsBtn.addEventListener('click', () => switchSection('projects'));
+
+    const newProjectBtn = document.getElementById('newProjectBtn');
+    if (newProjectBtn) newProjectBtn.addEventListener('click', () => showModal('newProjectModal'));
+
+    const createFirstProjectBtn = document.getElementById('createFirstProjectBtn');
+    if (createFirstProjectBtn) createFirstProjectBtn.addEventListener('click', () => showModal('newProjectModal'));
+
+    const createProjectBtn = document.getElementById('createProjectBtn');
+    if (createProjectBtn) createProjectBtn.addEventListener('click', createNewProject);
 
     // البحث
     const searchInput = document.getElementById('projectSearch');
@@ -141,7 +155,7 @@ function switchSection(sectionId) {
     if (sectionId === 'projects') loadProjects();
 }
 
-// ===== إدارة المشاريع (كما هي مع تحسينات) =====
+// ===== إدارة المشاريع =====
 function loadProjects() {
     try {
         const saved = localStorage.getItem('codeEditorProjects');
