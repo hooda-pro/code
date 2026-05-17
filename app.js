@@ -72,13 +72,13 @@ function initEvents() {
         }
     });
 
-    // التنقل
+    // التنقل (موبايل + ديسكتوب)
     document.querySelectorAll('.nav-link[data-section]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const section = link.dataset.section;
             switchSection(section);
-            nav.classList.remove('active');
+            if (nav) nav.classList.remove('active');
         });
     });
 
@@ -89,6 +89,14 @@ function initEvents() {
             e.preventDefault();
             showModal('aboutModal');
             nav.classList.remove('active');
+        });
+    }
+    // زر المطور - الديسكتوب
+    const aboutBtnDesktop = document.getElementById('aboutBtnDesktop');
+    if (aboutBtnDesktop) {
+        aboutBtnDesktop.addEventListener('click', (e) => {
+            e.preventDefault();
+            showModal('aboutModal');
         });
     }
 
@@ -148,9 +156,11 @@ function switchSection(sectionId) {
         target.classList.add('active');
         AppState.currentSection = sectionId;
     }
+    // تحديث كل النافات (موبايل + ديسكتوب)
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-    const activeLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
-    if (activeLink) activeLink.classList.add('active');
+    document.querySelectorAll(`.nav-link[data-section="${sectionId}"]`).forEach(link => {
+        link.classList.add('active');
+    });
 
     if (sectionId === 'projects') loadProjects();
 }

@@ -80,23 +80,34 @@
     height: 100vh;
 }
 
-/* الشريط الجانبي (للموبايل - مخفي افتراضياً) */
+/* الشريط الجانبي */
 .editor-sidebar {
-    position: fixed;
-    top: 0;
-    right: -280px;
-    width: 280px;
-    height: 100vh;
+    width: 240px;
+    flex-shrink: 0;
     background: var(--surface);
     border-left: 1px solid var(--border);
-    z-index: 2500;
-    transition: right 0.3s ease;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow);
+    overflow-y: auto;
+    transition: width 0.3s ease;
 }
-.editor-sidebar.active {
-    right: 0;
+
+/* الموبايل: الشريط الجانبي overlay */
+@media (max-width: 768px) {
+    .editor-sidebar {
+        position: fixed;
+        top: 0;
+        right: -280px;
+        width: 260px;
+        height: 100vh;
+        z-index: 2500;
+        transition: right 0.3s ease;
+        overflow-y: auto;
+    }
+    .editor-sidebar.active {
+        right: 0;
+    }
 }
 .sidebar-header {
     display: flex;
@@ -104,6 +115,11 @@
     align-items: center;
     padding: 1rem;
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+@media (min-width: 769px) {
+    .sidebar-header #closeSidebar { display: none; }
+    .mobile-menu-toggle { display: none !important; }
 }
 .sidebar-header h3 { font-size: 1rem; }
 .sidebar-section {
@@ -511,6 +527,9 @@
     .mobile-only, .mobile-menu-toggle, .mobile-bottom-nav, .mobile-more {
         display: none !important;
     }
+    .editor-layout {
+        padding-bottom: 0;
+    }
 }
 @media (max-width: 768px) {
     .desktop-only { display: none !important; }
@@ -519,7 +538,6 @@
     .project-badge h1 { max-width: 80px; font-size: 0.85rem; }
     .project-badge i { font-size: 1.1rem; }
     .editor-layout { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0px)); }
-    .editor-sidebar { width: 260px; }
     .editor-statusbar .shortcuts { display: none; }
     .editor-statusbar {
         font-size: 0.7rem;
@@ -571,6 +589,23 @@
     }
     .editor-toolbar .toolbar-actions {
         gap: 0.3rem;
+    }
+}
+
+@media (min-width: 769px) {
+    #codeInput {
+        font-size: 0.95rem;
+    }
+    .editor-header {
+        padding: 0.5rem 1.25rem;
+    }
+    .project-badge h1 {
+        max-width: 200px;
+        font-size: 1rem;
+    }
+    .editor-statusbar {
+        font-size: 0.82rem;
+        padding: 0.45rem 1.25rem;
     }
 }
 

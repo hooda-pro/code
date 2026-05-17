@@ -85,13 +85,23 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 
 /* ===== التطبيق الرئيسي ===== */
 .app {
-    max-width: 600px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0.75rem;
+    padding: 0 1.5rem;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+@media (max-width: 768px) {
+    .app {
+        padding: 0 0.75rem;
+        padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+    }
+}
+@media (max-width: 400px) {
+    .app { padding: 0 0.5rem; }
 }
 
 /* ===== الهيدر ===== */
@@ -99,21 +109,48 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
+    padding: 0.75rem 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    gap: 1rem;
 }
 .logo {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     font-weight: 700;
+    flex-shrink: 0;
 }
 .logo i { color: var(--primary); font-size: 1.5rem; }
 .accent { color: var(--primary); }
+
+/* ناف بار أفقي للديسكتوب */
+.desktop-nav {
+    display: none;
+    list-style: none;
+    gap: 0.25rem;
+    flex: 1;
+    justify-content: center;
+    padding: 0 1rem;
+}
+.desktop-nav .nav-link {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.9rem;
+    border-radius: 40px;
+    white-space: nowrap;
+}
+.desktop-nav .nav-link i { font-size: 0.85rem; }
+
+@media (min-width: 769px) {
+    .desktop-nav { display: flex; }
+    .mobile-menu-btn { display: none !important; }
+}
+
 .header-actions {
     display: flex;
     gap: 0.75rem;
+    flex-shrink: 0;
 }
 .theme-toggle, .mobile-menu-btn {
     background: var(--surface);
@@ -216,12 +253,13 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 /* ===== الهيرو ===== */
 .hero {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding: 2rem 0;
 }
 .hero h1 {
-    font-size: 1.9rem;
-    line-height: 1.3;
-    margin-bottom: 0.75rem;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    line-height: 1.2;
+    margin-bottom: 1rem;
     font-weight: 700;
 }
 .gradient-text {
@@ -231,15 +269,18 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 }
 .hero-subtitle {
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
+    margin-bottom: 2rem;
+    font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 0 0.5rem;
 }
 .hero-buttons {
     display: flex;
     gap: 0.75rem;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     flex-wrap: wrap;
 }
 .stats {
@@ -252,7 +293,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 40px;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -403,7 +444,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 }
 .projects-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
     margin-top: 1rem;
 }
@@ -460,7 +501,7 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 /* ===== المميزات ===== */
 .features-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
 }
 .feature-card {
@@ -485,20 +526,36 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 
 /* ===== الفوتر مع المطور ===== */
 .app-footer {
-    margin-top: 2.5rem;
+    margin-top: 3rem;
     background: var(--surface);
     border-radius: var(--radius) var(--radius) 0 0;
-    padding: 1.5rem 1.25rem;
+    padding: 2rem 2rem 1.5rem;
     border-top: 1px solid var(--border);
 }
 .footer-content {
     display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 1.25rem;
+    flex-direction: row;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    justify-content: space-between;
+    align-items: flex-start;
 }
-.footer-brand, .footer-info {
-    text-align: center;
+.footer-brand {
+    text-align: right;
+    flex: 1;
+}
+.footer-info {
+    text-align: right;
+    flex: 1;
+}
+@media (max-width: 600px) {
+    .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .footer-brand, .footer-info { text-align: center; }
+    .footer-info p { justify-content: center; }
+    .app-footer { padding: 1.5rem 1rem 1rem; }
 }
 .footer-brand i {
     font-size: 2.5rem;
@@ -513,7 +570,6 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
 .footer-info p {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
@@ -859,12 +915,40 @@ textarea.form-control { min-height: 5rem; }
         gap: 0.5rem;
         text-align: center;
     }
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1025px) {
+    .projects-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .features-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .section-header h2 {
+        font-size: 1.8rem;
+    }
+    .code-preview {
+        max-width: 700px;
+        margin: 2rem auto;
+    }
+    .hero {
+        padding: 3rem 0 2.5rem;
+    }
 }
 
 @media (max-width: 400px) {
-    .app {
-        padding: 0.5rem;
-    }
     .hero h1 {
         font-size: 1.3rem;
     }
@@ -876,7 +960,7 @@ textarea.form-control { min-height: 5rem; }
         width: 100%;
     }
     .features-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
     .stats {
         flex-direction: column;
