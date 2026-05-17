@@ -288,7 +288,7 @@ function createNewProject() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         files: getDefaultFiles(name),
-        fileTypes: { 'index.html': 'html', 'style.css': 'css', 'script.js': 'javascript' }
+        fileTypes: {}
     };
 
     AppState.projects.unshift(newProject);
@@ -324,11 +324,7 @@ function filterProjects(query) {
 }
 
 function getDefaultFiles(projectName) {
-    return {
-        'index.html': `<!DOCTYPE html>\n<html dir="rtl">\n<head>\n    <meta charset="UTF-8">\n    <title>${projectName}</title>\n    <link rel="stylesheet" href="style.css">\n</head>\n<body>\n    <h1>مرحباً</h1>\n</body>\n</html>`,
-        'style.css': `body { font-family: sans-serif; }`,
-        'script.js': `console.log('مرحباً');`
-    };
+    return {};
 }
 
 // ===== المودالات =====

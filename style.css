@@ -350,6 +350,24 @@ button, .btn, .nav-link, .file-item, .tab, .tool-btn {
     justify-content: center;
 }
 .btn-block { width: 100%; }
+.btn-success {
+    background: var(--success);
+    color: white;
+    border: none;
+}
+.btn-success:active {
+    background: #0aa86a;
+    transform: scale(0.96);
+}
+.btn-danger {
+    background: var(--danger);
+    color: white;
+    border: none;
+}
+.btn-danger:active {
+    background: #d93a3a;
+    transform: scale(0.96);
+}
 
 /* ===== شبكة المشاريع ===== */
 .projects-controls {
@@ -819,5 +837,53 @@ textarea.form-control { min-height: 5rem; }
 @media (max-width: 768px) {
     .help-contact-section {
         grid-template-columns: 1fr;
+    }
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+    .code-preview pre {
+        font-size: 0.75rem;
+    }
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    .projects-controls {
+        flex-direction: column;
+    }
+    .project-actions .btn {
+        flex: 1;
+        min-width: 0;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 400px) {
+    .app {
+        padding: 0.5rem;
+    }
+    .hero h1 {
+        font-size: 1.3rem;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .hero-buttons .btn {
+        width: 100%;
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    .stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    .stat-item {
+        width: 100%;
+        justify-content: center;
     }
 }

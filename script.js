@@ -308,6 +308,7 @@ function updateFilesList() {
                 ${file.unsaved ? '<span class="file-unsaved">●</span>' : ''}
             </div>
             <div class="file-actions">
+                <button class="file-action-btn download-file" title="تحميل"><i class="fas fa-download"></i></button>
                 <button class="file-action-btn close-file" title="إغلاق"><i class="fas fa-times"></i></button>
             </div>
         `;
@@ -326,7 +327,29 @@ function updateFilesList() {
                 closeFile(idx);
             });
         }
+        const downloadBtn = item.querySelector('.download-file');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(item.dataset.index);
+                downloadSingleFile(idx);
+            });
+        }
     });
+}
+
+function downloadSingleFile(index) {
+    const file = EditorState.files[index];
+    if (!file) return;
+    const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+    showToast(`تم تحميل "${file.name}"`, 'success');
 }
 
 function updateEditorTabs() {
@@ -366,7 +389,13 @@ function updateCurrentFile() {
     const languageSelect = document.getElementById('languageSelect');
     const currentFileName = document.getElementById('currentFileName');
     if (!EditorState.currentFile) {
-        if (codeInput) codeInput.value = '';
+        if (codeInput) {
+            if (EditorState.files.length === 0) {
+                codeInput.value = '👈 أضف ملف جديد للبدء في البرمجة\n\nاضغط على زر "ملف جديد" في الشريط الجانبي أو من القائمة.';
+            } else {
+                codeInput.value = '';
+            }
+        }
         if (currentFileName) currentFileName.textContent = 'اختر ملفاً';
         if (languageSelect) languageSelect.value = 'html';
         return;
@@ -545,6 +574,7 @@ function filterFiles(query) {
                 </div>
                 <div class="file-manager-actions">
                     <button class="btn btn-sm btn-primary open-manager-file"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-success download-manager-file"><i class="fas fa-download"></i></button>
                     <button class="btn btn-sm btn-danger delete-manager-file"><i class="fas fa-trash"></i></button>
                 </div>
             `;
@@ -554,6 +584,12 @@ function filterFiles(query) {
                 openBtn.addEventListener('click', () => {
                     hideAllModals();
                     switchToFile(originalIndex);
+                });
+            }
+            const downloadBtn = item.querySelector('.download-manager-file');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    downloadSingleFile(originalIndex);
                 });
             }
             const deleteBtn = item.querySelector('.delete-manager-file');
