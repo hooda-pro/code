@@ -428,7 +428,7 @@ function updateCursorPosition() {
     const line = lines.length;
     const column = lines[lines.length - 1].length + 1;
     const cursorPos = document.getElementById('cursorPos');
-    if (cursorPos) cursorPos.textContent = `السطر ${line}، العمود ${column}`;
+    if (cursorPos) cursorPos.textContent = `س${line} ع${column}`;
 }
 
 function updateProjectStatus(msg, type = 'info') {
