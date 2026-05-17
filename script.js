@@ -893,23 +893,32 @@ function initTheme() {
 
 // ===== ملء الشاشة =====
 function toggleFullscreen() {
-    const container = document.querySelector('.editor-app');
-    if (!document.fullscreenElement) {
-        if (container?.requestFullscreen) {
-            container.requestFullscreen();
+    const el = document.documentElement;
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+    if (!fsEl) {
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+        if (req) {
+            req.call(el).catch(() => showToast('ملء الشاشة غير مدعوم', 'error'));
             EditorState.isFullscreen = true;
+        } else {
+            showToast('المتصفح لا يدعم ملء الشاشة', 'warning');
         }
     } else {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+        if (exit) {
+            exit.call(document);
             EditorState.isFullscreen = false;
         }
     }
 }
 
-document.addEventListener('fullscreenchange', () => {
-    EditorState.isFullscreen = !!document.fullscreenElement;
-});
+function onFullscreenChange() {
+    EditorState.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
+document.addEventListener('fullscreenchange', onFullscreenChange);
+document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+document.addEventListener('mozfullscreenchange', onFullscreenChange);
+document.addEventListener('MSFullscreenChange', onFullscreenChange);
 
 // ===== معاينة =====
 function openPreview() {
