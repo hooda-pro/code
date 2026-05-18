@@ -283,7 +283,6 @@ function updateFilesList() {
                 ${file.unsaved ? '<span class="file-unsaved">●</span>' : ''}
             </div>
             <div class="file-actions">
-                <button class="file-action-btn download-file" title="تحميل"><i class="fas fa-download"></i></button>
                 <button class="file-action-btn close-file" title="إغلاق"><i class="fas fa-times"></i></button>
             </div>
         `;
@@ -302,29 +301,7 @@ function updateFilesList() {
                 closeFile(idx);
             });
         }
-        const downloadBtn = item.querySelector('.download-file');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = parseInt(item.dataset.index);
-                downloadSingleFile(idx);
-            });
-        }
     });
-}
-
-function downloadSingleFile(index) {
-    const file = EditorState.files[index];
-    if (!file) return;
-    const blob = new Blob([file.content], { type: 'text/plain;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = file.name;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-    showToast(`تم تحميل "${file.name}"`, 'success');
 }
 
 function updateEditorTabs() {
@@ -364,13 +341,7 @@ function updateCurrentFile() {
     const languageSelect = document.getElementById('languageSelect');
     const currentFileName = document.getElementById('currentFileName');
     if (!EditorState.currentFile) {
-        if (codeInput) {
-            if (EditorState.files.length === 0) {
-                codeInput.value = '👈 أضف ملف جديد للبدء في البرمجة\n\nاضغط على زر "ملف جديد" في الشريط الجانبي أو من القائمة.';
-            } else {
-                codeInput.value = '';
-            }
-        }
+        if (codeInput) codeInput.value = '';
         if (currentFileName) currentFileName.textContent = 'اختر ملفاً';
         if (languageSelect) languageSelect.value = 'html';
         return;
@@ -428,7 +399,7 @@ function updateCursorPosition() {
     const line = lines.length;
     const column = lines[lines.length - 1].length + 1;
     const cursorPos = document.getElementById('cursorPos');
-    if (cursorPos) cursorPos.textContent = `س${line} ع${column}`;
+    if (cursorPos) cursorPos.textContent = `السطر ${line}، العمود ${column}`;
 }
 
 function updateProjectStatus(msg, type = 'info') {
@@ -549,7 +520,6 @@ function filterFiles(query) {
                 </div>
                 <div class="file-manager-actions">
                     <button class="btn btn-sm btn-primary open-manager-file"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-sm btn-success download-manager-file"><i class="fas fa-download"></i></button>
                     <button class="btn btn-sm btn-danger delete-manager-file"><i class="fas fa-trash"></i></button>
                 </div>
             `;
@@ -559,12 +529,6 @@ function filterFiles(query) {
                 openBtn.addEventListener('click', () => {
                     hideAllModals();
                     switchToFile(originalIndex);
-                });
-            }
-            const downloadBtn = item.querySelector('.download-manager-file');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    downloadSingleFile(originalIndex);
                 });
             }
             const deleteBtn = item.querySelector('.delete-manager-file');
@@ -868,32 +832,23 @@ function initTheme() {
 
 // ===== ملء الشاشة =====
 function toggleFullscreen() {
-    const el = document.documentElement;
-    const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
-    if (!fsEl) {
-        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
-        if (req) {
-            req.call(el).catch(() => showToast('ملء الشاشة غير مدعوم', 'error'));
+    const container = document.querySelector('.editor-app');
+    if (!document.fullscreenElement) {
+        if (container?.requestFullscreen) {
+            container.requestFullscreen();
             EditorState.isFullscreen = true;
-        } else {
-            showToast('المتصفح لا يدعم ملء الشاشة', 'warning');
         }
     } else {
-        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
-        if (exit) {
-            exit.call(document);
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
             EditorState.isFullscreen = false;
         }
     }
 }
 
-function onFullscreenChange() {
-    EditorState.isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
-}
-document.addEventListener('fullscreenchange', onFullscreenChange);
-document.addEventListener('webkitfullscreenchange', onFullscreenChange);
-document.addEventListener('mozfullscreenchange', onFullscreenChange);
-document.addEventListener('MSFullscreenChange', onFullscreenChange);
+document.addEventListener('fullscreenchange', () => {
+    EditorState.isFullscreen = !!document.fullscreenElement;
+});
 
 // ===== معاينة =====
 function openPreview() {

@@ -3,8 +3,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    height: 100dvh;
-    height: -webkit-fill-available;
     background: var(--bg);
     color: var(--text);
     overflow: hidden;
@@ -69,15 +67,6 @@
     min-height: 0;
     overflow: hidden;
     position: relative;
-}
-
-/* ملء الشاشة */
-.editor-app:fullscreen,
-.editor-app:-webkit-full-screen,
-.editor-app:-moz-full-screen,
-.editor-app:-ms-fullscreen {
-    width: 100vw;
-    height: 100vh;
 }
 
 /* الشريط الجانبي (للموبايل - مخفي افتراضياً) */
@@ -153,28 +142,16 @@
 }
 .file-unsaved { color: var(--warning); margin-right: 0.25rem; font-size: 0.7rem; }
 .file-actions {
-    display: flex;
-    gap: 0.25rem;
-    opacity: 0.6;
+    opacity: 0.5;
 }
-.file-item:hover .file-actions,
 .file-item:active .file-actions { opacity: 1; }
 .file-action-btn {
     background: none;
     border: none;
     color: var(--text);
-    padding: 0.35rem;
+    padding: 0.25rem;
     border-radius: 4px;
-    font-size: 0.85rem;
-    transition: var(--transition);
 }
-.file-action-btn:active {
-    background: var(--surface-hover);
-    color: var(--primary);
-    transform: scale(0.9);
-}
-.file-action-btn.download-file { color: var(--success); }
-.file-action-btn.close-file { color: var(--danger); }
 
 /* أدوات الشبكة */
 .tools-grid {
@@ -230,7 +207,6 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    min-height: 0;
     background: var(--bg);
 }
 
@@ -333,8 +309,7 @@
 #codeInput {
     flex: 1;
     width: 100%;
-    min-height: 0;
-    align-self: stretch;
+    height: 100%;
     background: var(--bg);
     color: var(--text);
     border: none;
@@ -373,15 +348,13 @@
 .editor-statusbar {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.2rem 0.8rem;
+    gap: 1rem;
+    padding: 0.4rem 1rem;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     flex-shrink: 0;
-    height: 1.6rem;
-    overflow: hidden;
 }
 .shortcuts { margin-right: auto; font-size: 0.7rem; }
 
@@ -393,8 +366,6 @@
     left: 0;
     right: 0;
     height: 3.5rem;
-    height: calc(3.5rem + env(safe-area-inset-bottom, 0px));
-    padding-bottom: env(safe-area-inset-bottom, 0px);
     background: var(--surface);
     border-top: 1px solid var(--border);
     z-index: 2000;
@@ -510,72 +481,18 @@
     color: var(--text-muted);
 }
 
+/* إخفاء العناصر حسب الشاشة */
+@media (min-width: 769px) {
+    .mobile-only, .mobile-menu-toggle, .mobile-bottom-nav, .mobile-more {
+        display: none !important;
+    }
+}
 @media (max-width: 768px) {
     .desktop-only { display: none !important; }
     .mobile-bottom-nav { display: flex; }
-    .editor-header { padding: 0.3rem 0.5rem; min-height: 2.8rem; }
-    .project-badge h1 { max-width: 90px; font-size: 0.85rem; }
-    .project-badge i { font-size: 1.1rem; }
-    .project-status { display: none; }
-    .mobile-bottom-nav {
-        height: 3rem;
-        height: calc(3rem + env(safe-area-inset-bottom, 0px));
-    }
-    .editor-layout { padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px)); }
+    .editor-header { padding: 0.5rem 0.75rem; }
+    .project-badge h1 { max-width: 100px; }
+    .editor-layout { padding-bottom: 3.5rem; }
     .editor-sidebar { width: 260px; }
-
-    /* إخفاء شريط الحالة كلياً على موبايل */
-    .editor-statusbar { display: none !important; }
-
-    /* منطقة الكود */
-    #codeInput {
-        font-size: 0.95rem;
-        padding: 0.75rem 0.75rem 0.75rem 2.5rem;
-    }
-    .line-numbers { width: 2rem; font-size: 0.75rem; }
-    .line-number { height: 1.6rem; line-height: 1.6rem; font-size: 0.7rem; }
-
-    /* toolbar سطر واحد بدون wrap */
-    .editor-toolbar {
-        padding: 0.25rem 0.5rem;
-        flex-wrap: nowrap;
-        gap: 0.3rem;
-        min-height: 0;
-    }
-    .editor-toolbar .file-info {
-        font-size: 0.8rem;
-        flex: 1;
-        overflow: hidden;
-        white-space: nowrap;
-    }
-    .editor-toolbar .file-info span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 110px;
-        display: inline-block;
-        vertical-align: middle;
-    }
-    .language-select { font-size: 0.75rem; padding: 0.2rem 0.4rem; min-height: 1.6rem; }
-    .editor-toolbar .toolbar-actions { gap: 0.25rem; flex-shrink: 0; }
-
-    /* التابات */
-    .editor-tabs { min-height: 2.2rem; }
-    .tab { font-size: 0.75rem; padding: 0 0.6rem; height: 2.2rem; }
-
-    .bottom-nav-item { font-size: 0.6rem; }
-    .bottom-nav-item i { font-size: 1rem; }
-    .file-item { padding: 0.6rem; }
-    .file-name { font-size: 0.8rem; }
-}
-
-@media (max-width: 400px) {
-    .editor-header { padding: 0.25rem 0.4rem; min-height: 2.6rem; }
-    .header-left, .header-right { gap: 0.25rem; }
-    .project-badge h1 { max-width: 70px; font-size: 0.8rem; }
-    .editor-toolbar { padding: 0.2rem 0.4rem; }
-    #codeInput { font-size: 0.9rem; padding: 0.5rem 0.5rem 0.5rem 2rem; }
-    .line-numbers { width: 1.8rem; font-size: 0.68rem; }
-    .tools-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
-    .tool-btn { font-size: 0.75rem; padding: 0.5rem; }
+    .editor-statusbar .shortcuts { display: none; }
 }

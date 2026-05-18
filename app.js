@@ -72,13 +72,13 @@ function initEvents() {
         }
     });
 
-    // التنقل (موبايل + ديسكتوب)
+    // التنقل
     document.querySelectorAll('.nav-link[data-section]').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const section = link.dataset.section;
             switchSection(section);
-            if (nav) nav.classList.remove('active');
+            nav.classList.remove('active');
         });
     });
 
@@ -89,14 +89,6 @@ function initEvents() {
             e.preventDefault();
             showModal('aboutModal');
             nav.classList.remove('active');
-        });
-    }
-    // زر المطور - الديسكتوب
-    const aboutBtnDesktop = document.getElementById('aboutBtnDesktop');
-    if (aboutBtnDesktop) {
-        aboutBtnDesktop.addEventListener('click', (e) => {
-            e.preventDefault();
-            showModal('aboutModal');
         });
     }
 
@@ -156,11 +148,9 @@ function switchSection(sectionId) {
         target.classList.add('active');
         AppState.currentSection = sectionId;
     }
-    // تحديث كل النافات (موبايل + ديسكتوب)
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-    document.querySelectorAll(`.nav-link[data-section="${sectionId}"]`).forEach(link => {
-        link.classList.add('active');
-    });
+    const activeLink = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+    if (activeLink) activeLink.classList.add('active');
 
     if (sectionId === 'projects') loadProjects();
 }
@@ -298,7 +288,7 @@ function createNewProject() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         files: getDefaultFiles(name),
-        fileTypes: {}
+        fileTypes: { 'index.html': 'html', 'style.css': 'css', 'script.js': 'javascript' }
     };
 
     AppState.projects.unshift(newProject);
@@ -334,7 +324,11 @@ function filterProjects(query) {
 }
 
 function getDefaultFiles(projectName) {
-    return {};
+    return {
+        'index.html': `<!DOCTYPE html>\n<html dir="rtl">\n<head>\n    <meta charset="UTF-8">\n    <title>${projectName}</title>\n    <link rel="stylesheet" href="style.css">\n</head>\n<body>\n    <h1>مرحباً</h1>\n</body>\n</html>`,
+        'style.css': `body { font-family: sans-serif; }`,
+        'script.js': `console.log('مرحباً');`
+    };
 }
 
 // ===== المودالات =====

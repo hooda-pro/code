@@ -2,304 +2,223 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>VS Code — محرر الأكواد</title>
-    <meta name="description" content="محرر أكواد متطور للموبايل">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>VS Code محرر الأكواد للموبايل</title>
+    <meta name="description" content="محرر أكواد متطور يشبه VS Code، محسّن لأجهزة الأندرويد">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
 </head>
 <body class="dark-mode">
-
     <!-- شاشة التحميل -->
     <div class="loading-screen" id="loadingScreen">
         <div class="spinner"></div>
         <h3>جاري التحميل...</h3>
     </div>
 
-    <!-- التطبيق -->
-    <div class="app" id="app" style="display:none;">
-
+    <!-- التطبيق الرئيسي -->
+    <div class="app" id="app" style="display: none;">
         <!-- الهيدر -->
         <header class="app-header">
             <div class="logo">
-                <div class="logo-icon"><i class="fas fa-code"></i></div>
-                VS <span class="accent">Code</span>
+                <i class="fas fa-code"></i>
+                <span>VS <span class="accent">Code</span></span>
             </div>
             <div class="header-actions">
-                <button class="icon-btn theme-toggle" id="themeToggle" aria-label="تبديل المظهر">
+                <button class="theme-toggle" id="themeToggle" title="تبديل المظهر" aria-label="تبديل المظهر">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="icon-btn mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
         </header>
 
-        <!-- القائمة الجانبية -->
+        <!-- القائمة الجانبية (للموبايل) -->
         <nav class="mobile-nav" id="mobileNav">
             <div class="nav-header">
                 <h3>القائمة</h3>
-                <button class="close-nav" id="closeNav"><i class="fas fa-times"></i></button>
+                <button class="close-nav" id="closeNav" aria-label="إغلاق"><i class="fas fa-times"></i></button>
             </div>
             <ul class="nav-links">
                 <li><a href="#" class="nav-link active" data-section="home"><i class="fas fa-home"></i> الرئيسية</a></li>
-                <li><a href="#" class="nav-link" data-section="projects"><i class="fas fa-folder-open"></i> مشاريعي</a></li>
-                <li><a href="#" class="nav-link" data-section="features"><i class="fas fa-bolt"></i> المميزات</a></li>
+                <li><a href="#" class="nav-link" data-section="projects"><i class="fas fa-folder"></i> المشاريع</a></li>
+                <li><a href="#" class="nav-link" data-section="features"><i class="fas fa-star"></i> المميزات</a></li>
                 <li><a href="#" class="nav-link" data-section="help"><i class="fas fa-question-circle"></i> المساعدة</a></li>
-                <li><a href="#" id="aboutBtn" class="nav-link"><i class="fas fa-user"></i> عن المطور</a></li>
+                <li><a href="#" id="aboutBtn" class="nav-link"><i class="fas fa-user"></i> المطور</a></li>
             </ul>
         </nav>
 
+        <!-- قسم المساعدة -->
+<section id="helpSection" class="section">
+    <div class="section-header">
+        <h2><i class="fas fa-question-circle"></i> كيف تستخدم المحرر؟</h2>
+        <p>دليل سريع لمساعدتك على البدء</p>
+    </div>
+
+    <div class="help-cards">
+        <!-- بطريقة خطوة بخطوة -->
+        <div class="help-card glass">
+            <div class="help-icon"><i class="fas fa-rocket"></i></div>
+            <h3>الخطوة 1: إنشاء مشروع جديد</h3>
+            <p>اضغط على "مشروع جديد" في الصفحة الرئيسية، أدخل اسم المشروع ووصفاً (اختياري). سيتم إنشاء ثلاثة ملفات افتراضية: HTML, CSS, JavaScript.</p>
+        </div>
+
+        <div class="help-card glass">
+            <div class="help-icon"><i class="fas fa-edit"></i></div>
+            <h3>الخطوة 2: تحرير الكود</h3>
+            <p>اختر الملف الذي تريد تحريره من الشريط الجانبي أو من الألسنة في الأعلى. اكتب كودك مباشرة في المحرر. يمكنك تغيير لغة الملف من القائمة المنسدلة في شريط الأدوات.</p>
+        </div>
+
+        <div class="help-card glass">
+            <div class="help-icon"><i class="fas fa-save"></i></div>
+            <h3>الخطوة 3: حفظ المشروع</h3>
+            <p>يتم الحفظ التلقائي كل 30 ثانية. يمكنك أيضاً الضغط على زر "حفظ" في أي وقت أو استخدام اختصار Ctrl+S.</p>
+        </div>
+
+        <div class="help-card glass">
+            <div class="help-icon"><i class="fas fa-eye"></i></div>
+            <h3>الخطوة 4: معاينة المشروع</h3>
+            <p>اضغط على زر "معاينة" لفتح نافذة جديدة تعرض مشروعك. يمكنك تغيير حجم الشاشة (كمبيوتر، تابلت، موبايل) لترى كيف سيبدو موقعك على الأجهزة المختلفة.</p>
+        </div>
+
+        <div class="help-card glass">
+            <div class="help-icon"><i class="fas fa-download"></i></div>
+            <h3>الخطوة 5: تحميل المشروع</h3>
+            <p>عند الانتهاء، يمكنك تحميل المشروع كملف ZIP يحتوي على جميع الملفات ومعلومات المشروع.</p>
+        </div>
+    </div>
+
+    <!-- قسم الذكاء الاصطناعي والتواصل -->
+    <div class="help-ai-section glass">
+        <h3><i class="fas fa-robot"></i> مساعدة إضافية باستخدام الذكاء الاصطناعي</h3>
+        <p>إذا كنت تواجه صعوبة في البرمجة أو تحتاج إلى مساعدة في كتابة الكود، يمكنك استخدام DeepSeek - مساعد ذكاء اصطناعي متخصص في البرمجة.</p>
+        <div class="ai-buttons">
+            <a href="https://www.deepseek.com/" target="_blank" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> زيارة DeepSeek</a>
+            <button class="btn btn-outline" onclick="alert('يمكنك استخدام DeepSeek عبر الرابط أعلاه، أو البحث عن مساعدات برمجية أخرى.')"><i class="fas fa-info-circle"></i> كيف تستخدمه؟</button>
+        </div>
+    </div>
+
+    <!-- التواصل مع المطور ونشر الموقع -->
+    <div class="help-contact-section">
+        <div class="contact-card glass">
+            <h4><i class="fas fa-user"></i> تواصل مع المطور</h4>
+            <p>إذا كان لديك أي استفسار أو اقتراح، لا تتردد في التواصل:</p>
+            <div class="contact-links">
+                <a href="https://wa.me/15592731960" target="_blank" class="contact-link"><i class="fab fa-whatsapp"></i> واتساب</a>
+                <a href="mailto:hooda2024g1@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> بريد إلكتروني</a>
+            </div>
+        </div>
+        <div class="contact-card glass">
+            <h4><i class="fas fa-globe"></i> نشر موقعك على الإنترنت</h4>
+            <p>يمكنك نشر مشروعك مجاناً باستخدام خدمات مثل GitHub Pages أو Netlify. اتبع الخطوات التالية:</p>
+            <ul class="publish-steps">
+                <li>1. أنشئ حساباً على GitHub.</li>
+                <li>2. ارفع مشروعك إلى مستودع (repository) جديد.</li>
+                <li>3. فعّل GitHub Pages من إعدادات المستودع.</li>
+                <li>4. سيكون موقعك متاحاً على رابط مثل: username.github.io/repo-name</li>
+            </ul>
+            <a href="https://pages.github.com/" target="_blank" class="btn btn-sm btn-primary">شرح مفصل</a>
+        </div>
+    </div>
+</section>
+
         <!-- المحتوى الرئيسي -->
         <main class="main-content">
-
-            <!-- ===== الرئيسية ===== -->
+            <!-- الرئيسية -->
             <section id="homeSection" class="section active">
-
                 <div class="hero">
-                    <div class="hero-eyebrow"><i class="fas fa-mobile-alt"></i> محسَّن للموبايل</div>
-                    <h1>اكتب كودك<br>من <em>أي مكان</em></h1>
-                    <p class="hero-sub">محرر متكامل يشبه VS Code، يدعم أكثر من 15 لغة مع معاينة فورية وحفظ تلقائي.</p>
-                    <div class="hero-btns">
-                        <button class="btn btn-primary" id="startProjectBtn">
-                            <i class="fas fa-plus"></i> مشروع جديد
-                        </button>
-                        <button class="btn btn-outline" id="viewProjectsBtn">
-                            <i class="fas fa-folder-open"></i> مشاريعي
-                        </button>
+                    <h1>حوّل أفكارك إلى <span class="gradient-text">كود برمجي</span></h1>
+                    <p class="hero-subtitle">محرر متكامل للموبايل، يدعم 15+ لغة مع معاينة فورية وحفظ تلقائي.</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary" id="startProjectBtn"><i class="fas fa-rocket"></i> مشروع جديد</button>
+                        <button class="btn btn-outline" id="viewProjectsBtn"><i class="fas fa-eye"></i> مشاريعي</button>
+                    </div>
+                    <div class="stats">
+                        <div class="stat-item"><i class="fas fa-language"></i> <span>15+</span> لغة</div>
+                        <div class="stat-item"><i class="fas fa-bolt"></i> <span>معاينة</span> فورية</div>
+                        <div class="stat-item"><i class="fas fa-cloud"></i> <span>حفظ</span> تلقائي</div>
                     </div>
                 </div>
-
-                <div class="stats">
-                    <div class="stat-card">
-                        <span class="num">15+</span>
-                        <span class="lbl">لغة برمجة</span>
+                <div class="code-preview glass">
+                    <div class="code-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="filename">index.html</span>
                     </div>
-                    <div class="stat-card">
-                        <span class="num">∞</span>
-                        <span class="lbl">مشروع</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="num">مجاني</span>
-                        <span class="lbl">بالكامل</span>
-                    </div>
+                    <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;...&lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;مرحباً بالعالم!&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
                 </div>
-
-                <div class="code-window">
-                    <div class="cw-header">
-                        <div class="cw-dot r"></div>
-                        <div class="cw-dot y"></div>
-                        <div class="cw-dot g"></div>
-                        <span class="cw-fname">index.html</span>
-                    </div>
-                    <div class="cw-body">
-                        <div><span class="c">&lt;!-- </span><span class="a">مرحباً بالعالم</span><span class="c"> --&gt;</span></div>
-                        <div><span class="k">&lt;!</span><span class="t">DOCTYPE</span> <span class="a">html</span><span class="k">&gt;</span></div>
-                        <div><span class="k">&lt;html</span> <span class="a">dir</span>=<span class="s">"rtl"</span><span class="k">&gt;</span></div>
-                        <div>&nbsp;&nbsp;<span class="k">&lt;h1&gt;</span><span class="t">Hello, World!</span><span class="k">&lt;/h1&gt;</span></div>
-                        <div><span class="k">&lt;/html&gt;</span></div>
-                    </div>
-                </div>
-
             </section>
 
-            <!-- ===== المشاريع ===== -->
+            <!-- المشاريع -->
             <section id="projectsSection" class="section">
                 <div class="section-header">
-                    <div>
-                        <h2><i class="fas fa-folder-open"></i> مشاريعي</h2>
-                        <p>محفوظة على جهازك</p>
-                    </div>
-                    <button class="btn btn-primary btn-sm" id="newProjectBtn">
-                        <i class="fas fa-plus"></i> جديد
-                    </button>
+                    <h2><i class="fas fa-folder-open"></i> مشاريعك</h2>
+                    <p>جميع مشاريعك محفوظة محلياً</p>
                 </div>
-
-                <!-- search wrapper (الـ JS بيستخدم projectSearch) -->
-                <div class="projects-bar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="projectSearch" placeholder="ابحث في مشاريعك...">
-                    </div>
-                </div>
-
-                <div class="projects-grid" id="projectsGrid"></div>
-
-                <div class="empty-state" id="emptyProjects">
-                    <i class="fas fa-folder-open"></i>
-                    <h3>لا توجد مشاريع بعد</h3>
-                    <button class="btn btn-primary" id="createFirstProjectBtn">
-                        <i class="fas fa-plus"></i> أنشئ أول مشروع
-                    </button>
-                </div>
-
-                <!-- هذا الـ div مخفي للتوافق مع الـ JS -->
-                <div class="projects-controls" style="display:none;">
+                <div class="projects-controls">
                     <div class="search-wrapper">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="ابحث...">
+                        <input type="text" id="projectSearch" placeholder="ابحث...">
                     </div>
+                    <button class="btn btn-primary" id="newProjectBtn"><i class="fas fa-plus"></i> جديد</button>
+                </div>
+                <div class="projects-grid" id="projectsGrid"></div>
+                <div class="empty-state" id="emptyProjects">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>لا توجد مشاريع</h3>
+                    <button class="btn btn-primary" id="createFirstProjectBtn">أنشئ أول مشروع</button>
                 </div>
             </section>
 
-            <!-- ===== المميزات ===== -->
+            <!-- المميزات -->
             <section id="featuresSection" class="section">
                 <div class="section-header">
-                    <div>
-                        <h2><i class="fas fa-bolt"></i> المميزات</h2>
-                        <p>كل ما تحتاجه في مكان واحد</p>
-                    </div>
+                    <h2><i class="fas fa-star"></i> مميزات</h2>
                 </div>
                 <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-code"></i>
-                        <h3>محرر متعدد اللغات</h3>
-                        <p>HTML, CSS, JS, Python وأكثر من 12 لغة أخرى</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-eye"></i>
-                        <h3>معاينة فورية</h3>
-                        <p>شاهد مشروعك على شاشات مختلفة</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-cloud"></i>
-                        <h3>حفظ تلقائي</h3>
-                        <p>كل تغيير يُحفظ تلقائياً دون فقدان</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-download"></i>
-                        <h3>تصدير ZIP</h3>
-                        <p>حمّل مشروعك كاملاً بضغطة واحدة</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-search"></i>
-                        <h3>بحث واستبدال</h3>
-                        <p>ابحث في الكود واستبدل بسرعة</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h3>تصميم متجاوب</h3>
-                        <p>محسَّن بالكامل لأجهزة الموبايل</p>
-                    </div>
+                    <div class="feature-card glass"><i class="fas fa-code"></i><h3>محرر متعدد</h3><p>يدعم HTML, CSS, JS وغيرها</p></div>
+                    <div class="feature-card glass"><i class="fas fa-eye"></i><h3>معاينة مباشرة</h3><p>شاهد التغييرات فوراً</p></div>
+                    <div class="feature-card glass"><i class="fas fa-mobile-alt"></i><h3>تصميم متجاوب</h3><p>يعمل على جميع الشاشات</p></div>
+                    <div class="feature-card glass"><i class="fas fa-download"></i><h3>تصدير ZIP</h3><p>حمل مشروعك بضغطة</p></div>
                 </div>
             </section>
-
-            <!-- ===== المساعدة ===== -->
-            <section id="helpSection" class="section">
-                <div class="section-header">
-                    <div>
-                        <h2><i class="fas fa-question-circle"></i> كيف تبدأ؟</h2>
-                        <p>دليل سريع خطوة بخطوة</p>
-                    </div>
-                </div>
-
-                <div class="help-list">
-                    <div class="help-item">
-                        <div class="help-step">1</div>
-                        <div>
-                            <h4>أنشئ مشروعاً جديداً</h4>
-                            <p>اضغط على "مشروع جديد"، أدخل الاسم ونوع المشروع.</p>
-                        </div>
-                    </div>
-                    <div class="help-item">
-                        <div class="help-step">2</div>
-                        <div>
-                            <h4>حرِّر الكود</h4>
-                            <p>اختر الملف من الشريط الجانبي واكتب كودك مباشرةً.</p>
-                        </div>
-                    </div>
-                    <div class="help-item">
-                        <div class="help-step">3</div>
-                        <div>
-                            <h4>احفظ مشروعك</h4>
-                            <p>الحفظ تلقائي كل 30 ثانية، أو اضغط زر الحفظ يدوياً.</p>
-                        </div>
-                    </div>
-                    <div class="help-item">
-                        <div class="help-step">4</div>
-                        <div>
-                            <h4>استعرض المعاينة</h4>
-                            <p>اضغط "معاينة" لرؤية مشروعك على أحجام شاشة مختلفة.</p>
-                        </div>
-                    </div>
-                    <div class="help-item">
-                        <div class="help-step">5</div>
-                        <div>
-                            <h4>حمِّل مشروعك</h4>
-                            <p>عند الانتهاء، صدِّر المشروع كملف ZIP جاهز للرفع.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="help-ai">
-                    <h3><i class="fas fa-robot"></i> مساعدة بالذكاء الاصطناعي</h3>
-                    <p>هل تحتاج مساعدة في كتابة الكود؟ استخدم DeepSeek — مساعد متخصص في البرمجة.</p>
-                    <div class="help-ai-btns">
-                        <a href="https://www.deepseek.com/" target="_blank" class="btn btn-primary btn-sm">
-                            <i class="fas fa-external-link-alt"></i> فتح DeepSeek
-                        </a>
-                    </div>
-                </div>
-
-                <div class="help-contact">
-                    <div class="contact-card">
-                        <h4><i class="fas fa-user"></i> تواصل مع المطور</h4>
-                        <p>لأي استفسار أو اقتراح</p>
-                        <div class="contact-links">
-                            <a href="https://wa.me/15592731960" target="_blank" class="contact-link">
-                                <i class="fab fa-whatsapp"></i> واتساب
-                            </a>
-                            <a href="mailto:hooda2024g1@gmail.com" class="contact-link">
-                                <i class="fas fa-envelope"></i> إيميل
-                            </a>
-                        </div>
-                    </div>
-                    <div class="contact-card">
-                        <h4><i class="fas fa-globe"></i> نشر موقعك</h4>
-                        <p>انشر مشروعك مجاناً على الإنترنت</p>
-                        <ul class="publish-steps">
-                            <li>أنشئ حساب GitHub</li>
-                            <li>ارفع المشروع</li>
-                            <li>فعِّل GitHub Pages</li>
-                        </ul>
-                        <a href="https://pages.github.com/" target="_blank" class="contact-link" style="margin-top:0.5rem; display:inline-flex;">
-                            <i class="fab fa-github"></i> اعرف أكثر
-                        </a>
-                    </div>
-                </div>
-            </section>
-
         </main>
 
-        <!-- الفوتر -->
+        <!-- الفوتر مع المطور -->
         <footer class="app-footer">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <div class="logo">
-                        <div class="logo-icon"><i class="fas fa-code"></i></div>
-                        VS <span class="accent">Code</span>
-                    </div>
-                    <p>محرر أكواد للموبايل</p>
+                    <i class="fas fa-code"></i>
+                    <h3>VS Code Editor</h3>
+                    <p>محرر أكواد احترافي للموبايل</p>
                 </div>
                 <div class="footer-info">
                     <h4>المطور</h4>
                     <p><i class="fas fa-user"></i> محمود أحمد سعيد</p>
-                    <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/966570654655" target="_blank">واتساب</a></p>
-                    <p><i class="fas fa-envelope"></i> <a href="mailto:hooda2024g1@gmail.com">hooda2024g1@gmail.com</a></p>
+                   <p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/966570654655" target="_blank">+966 57 065 4655</a></p>
+                <p><i class="fas fa-envelope"></i> <a href=":hooda2024g1@gmail.com" target="contact-link">hooda2024g1@gmail.com</a></p>
+
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>© 2026 جميع الحقوق محفوظة</span>
-                <span>صُنع بـ <i class="fas fa-heart" style="color:var(--red);"></i> في مصر</span>
+                <p>© 2026 جميع الحقوق محفوظة</p>
+                <p>صُنع بـ <i class="fas fa-heart"></i> في مصر</p>
             </div>
         </footer>
+    </div>
 
-    </div><!-- end .app -->
-
-    <!-- ===== مودال مشروع جديد ===== -->
+    <!-- مودال إنشاء مشروع جديد -->
     <div class="modal" id="newProjectModal">
-        <div class="modal-content">
+        <div class="modal-content glass">
             <div class="modal-header">
                 <h3><i class="fas fa-plus-circle"></i> مشروع جديد</h3>
                 <button class="modal-close">&times;</button>
@@ -308,33 +227,31 @@
                 <form id="projectForm">
                     <div class="form-group">
                         <label>اسم المشروع</label>
-                        <input type="text" id="projectName" class="form-control" placeholder="مثال: موقعي الأول" required>
+                        <input type="text" id="projectName" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>النوع</label>
+                        <label>نوع المشروع</label>
                         <select id="projectType" class="form-control">
                             <option value="website">موقع ويب</option>
                             <option value="webapp">تطبيق ويب</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>وصف قصير <span style="color:var(--text-dim);font-weight:400;">(اختياري)</span></label>
-                        <textarea id="projectDescription" class="form-control" placeholder="ماذا ستبني؟"></textarea>
+                        <label>وصف (اختياري)</label>
+                        <textarea id="projectDescription" class="form-control" rows="2"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline modal-close">إلغاء</button>
-                <button class="btn btn-primary" id="createProjectBtn">
-                    <i class="fas fa-plus"></i> إنشاء
-                </button>
+                <button class="btn btn-secondary modal-close">إلغاء</button>
+                <button class="btn btn-primary" id="createProjectBtn">إنشاء</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== مودال عن المطور ===== -->
+    <!-- مودال عن المطور -->
     <div class="modal" id="aboutModal">
-        <div class="modal-content">
+        <div class="modal-content glass">
             <div class="modal-header">
                 <h3><i class="fas fa-user-tie"></i> عن المطور</h3>
                 <button class="modal-close">&times;</button>
@@ -342,7 +259,7 @@
             <div class="modal-body">
                 <div class="developer-profile">
                     <div class="avatar"><i class="fas fa-user"></i></div>
-                    <h3 style="font-size:1.1rem; font-weight:800;">محمود أحمد سعيد</h3>
+                    <h3>محمود أحمد سعيد</h3>
                     <p class="title">مطور ويب ومهندس برمجيات</p>
                     <p class="bio">خبرة في تصميم وتطوير تطبيقات الويب والموبايل باستخدام أحدث التقنيات.</p>
                     <div class="skills">
@@ -354,65 +271,17 @@
                     </div>
                     <div class="contact">
                         <h4>تواصل معي</h4>
-                        <a href="https://wa.me/966570654655" target="_blank" class="contact-btn">
-                            <i class="fab fa-whatsapp"></i> واتساب
-                        </a>
+                        <a href="https://wa.me/966570654655" target="_blank" class="contact-btn"><i class="fab fa-whatsapp"></i> واتساب</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- التوست -->
+    <!-- حاوية التوست -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="app.js"></script>
-
-    <!-- تخصيص بطاقات المشاريع للتصميم الجديد -->
-    <script>
-    // تخصيص createProjectCard لتستخدم تصميم البطاقات الجديد
-    document.addEventListener('DOMContentLoaded', () => {
-        // override createProjectCard after app.js loads
-        if (typeof createProjectCard === 'undefined') return;
-    });
-    // patch createProjectCard
-    window.addEventListener('load', () => {
-        const origCreate = window.createProjectCard;
-        if (!origCreate) return;
-        window.createProjectCard = function(project, index) {
-            const card = document.createElement('div');
-            card.className = 'project-card';
-            card.dataset.index = index;
-            const date = new Date(project.updatedAt).toLocaleDateString('ar-EG', { month: 'short', day: 'numeric' });
-            const fileCount = Object.keys(project.files || {}).length;
-            const name = String(project.name).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-            const desc = String(project.description || 'بدون وصف').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-            card.innerHTML = `
-                <div class="project-top">
-                    <div class="project-ico"><i class="fas fa-code"></i></div>
-                    <div class="project-meta">
-                        <h3>${name}</h3>
-                        <div class="project-date">${date}</div>
-                    </div>
-                </div>
-                <div class="project-desc">${desc}</div>
-                <div class="project-footer">
-                    <div class="project-tag"><i class="fas fa-file-code"></i> ${fileCount} ملف</div>
-                    <div class="project-actions">
-                        <button class="pact-btn open open-project" title="فتح"><i class="fas fa-edit"></i></button>
-                        <button class="pact-btn download-project" title="تحميل"><i class="fas fa-download"></i></button>
-                        <button class="pact-btn delete-project" title="حذف"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-            card.querySelector('.open-project').addEventListener('click', e => { e.stopPropagation(); openProject(index); });
-            card.querySelector('.download-project').addEventListener('click', e => { e.stopPropagation(); prepareDownload(index); });
-            card.querySelector('.delete-project').addEventListener('click', e => { e.stopPropagation(); deleteProject(index); });
-            card.addEventListener('click', () => openProject(index));
-            return card;
-        };
-    });
-    </script>
 </body>
 </html>
