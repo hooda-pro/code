@@ -230,6 +230,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     background: var(--bg);
 }
 
@@ -372,13 +373,15 @@
 .editor-statusbar {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.4rem 1rem;
+    gap: 0.6rem;
+    padding: 0.2rem 0.8rem;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
     flex-shrink: 0;
+    height: 1.6rem;
+    overflow: hidden;
 }
 .shortcuts { margin-right: auto; font-size: 0.7rem; }
 
@@ -507,12 +510,6 @@
     color: var(--text-muted);
 }
 
-/* إخفاء العناصر حسب الشاشة */
-@media (min-width: 769px) {
-    .mobile-only, .mobile-menu-toggle, .mobile-bottom-nav, .mobile-more {
-        display: none !important;
-    }
-}
 @media (max-width: 768px) {
     .desktop-only { display: none !important; }
     .mobile-bottom-nav { display: flex; }
@@ -526,24 +523,24 @@
     }
     .editor-layout { padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px)); }
     .editor-sidebar { width: 260px; }
-    .editor-statusbar { display: none; }
+
+    /* إخفاء شريط الحالة كلياً على موبايل */
+    .editor-statusbar { display: none !important; }
+
+    /* منطقة الكود */
     #codeInput {
         font-size: 0.95rem;
         padding: 0.75rem 0.75rem 0.75rem 2.5rem;
     }
-    .line-numbers {
-        width: 2rem;
-        font-size: 0.75rem;
-    }
-    .line-number {
-        height: 1.6rem;
-        line-height: 1.6rem;
-        font-size: 0.7rem;
-    }
+    .line-numbers { width: 2rem; font-size: 0.75rem; }
+    .line-number { height: 1.6rem; line-height: 1.6rem; font-size: 0.7rem; }
+
+    /* toolbar سطر واحد بدون wrap */
     .editor-toolbar {
         padding: 0.25rem 0.5rem;
         flex-wrap: nowrap;
         gap: 0.3rem;
+        min-height: 0;
     }
     .editor-toolbar .file-info {
         font-size: 0.8rem;
@@ -555,24 +552,17 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        max-width: 120px;
+        max-width: 110px;
         display: inline-block;
+        vertical-align: middle;
     }
-    .language-select {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.4rem;
-        min-height: 1.6rem;
-    }
-    .editor-toolbar .toolbar-actions {
-        gap: 0.25rem;
-        flex-shrink: 0;
-    }
-    .tab {
-        font-size: 0.75rem;
-        padding: 0 0.6rem;
-        height: 2.2rem;
-    }
+    .language-select { font-size: 0.75rem; padding: 0.2rem 0.4rem; min-height: 1.6rem; }
+    .editor-toolbar .toolbar-actions { gap: 0.25rem; flex-shrink: 0; }
+
+    /* التابات */
     .editor-tabs { min-height: 2.2rem; }
+    .tab { font-size: 0.75rem; padding: 0 0.6rem; height: 2.2rem; }
+
     .bottom-nav-item { font-size: 0.6rem; }
     .bottom-nav-item i { font-size: 1rem; }
     .file-item { padding: 0.6rem; }
@@ -584,20 +574,8 @@
     .header-left, .header-right { gap: 0.25rem; }
     .project-badge h1 { max-width: 70px; font-size: 0.8rem; }
     .editor-toolbar { padding: 0.2rem 0.4rem; }
-    #codeInput {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.5rem 0.5rem 2rem;
-    }
-    .line-numbers {
-        width: 1.8rem;
-        font-size: 0.68rem;
-    }
-    .tools-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.3rem;
-    }
-    .tool-btn {
-        font-size: 0.75rem;
-        padding: 0.5rem;
-    }
+    #codeInput { font-size: 0.9rem; padding: 0.5rem 0.5rem 0.5rem 2rem; }
+    .line-numbers { width: 1.8rem; font-size: 0.68rem; }
+    .tools-grid { grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+    .tool-btn { font-size: 0.75rem; padding: 0.5rem; }
 }
